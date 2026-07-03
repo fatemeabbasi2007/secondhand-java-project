@@ -1,0 +1,31 @@
+package org.example.backend.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class User {
+    private String id;               // Unique UUID string
+    private String username;
+    private String password;
+    private String email;
+
+    //  "USER" or "ADMIN"
+    private String role;
+
+    // for being blocked by admin
+    private boolean enabled = true;
+
+    // IDs of favorited ads
+    private List<String> favoriteAdIds = new ArrayList<>();
+
+    // ratings
+    private double averageRating = 0.0;
+    private int totalRatingsCount = 0;
+
+}
