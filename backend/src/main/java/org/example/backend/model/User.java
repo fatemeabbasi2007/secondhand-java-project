@@ -14,6 +14,7 @@ public class User {
     private String username;
     private String password;
     private String email;
+    private String phoneNum;
 
     //  "USER" or "ADMIN"
     private String role;
@@ -27,5 +28,8 @@ public class User {
     // ratings
     private double averageRating = 0.0;
     private int totalRatingsCount = 0;
+    public void addFavoriteToList(String id){
+        favoriteAdIds.add(id);
+    }
 
 }
