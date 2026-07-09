@@ -1,11 +1,14 @@
 package org.example.backend.controller;
 
+import jakarta.servlet.http.HttpSession;
+import org.example.backend.exeption.*;
 import org.example.backend.model.User;
 import org.example.backend.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.event.ListDataEvent;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,123 +22,126 @@ public class UserController {
         this.userService = userService;
     }
 
-    // ==========================================
-    // ۱. بخش احراز هویت و حساب کاربری (Authentication)
-    // ==========================================
-
-    /**
-     * سناریوی ثبت نام کاربر جدید
-     * فرانت‌اند داده‌ها را به آدرس POST http://localhost:8080/api/users/register می‌فرستد
-     */
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody User user) {
-        boolean isRegistered = userService.registerUser(user);
-        if (isRegistered) {
-            return ResponseEntity.status(HttpStatus.CREATED).body("ثبت‌نام با موفقیت انجام شد.");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("خطا: نام کاربری یا شماره تماس تکراری است.");
+    public ResponseEntity<?> register(@RequestBody User user) {
+        try {
+            userService.registerUser(user);
+            return ResponseEntity.ok(new MessageResponse("done successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
         }
     }
 
-    /**
-     * سناریوی ورود کاربر به سیستم
-     * فرانت‌اند داده‌ها را به آدرس POST http://localhost:8080/api/users/login می‌فرستد
-     */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestParam String username, @RequestParam String password) {
-        Optional<User> loggedInUser = userService.loginUser(username, password);
-
-        if (loggedInUser.isPresent()) {
-            // فرانت‌باید بر اساس نقش کاربر (مدیر یا عادی) صفحه مناسب را باز کند
-            return ResponseEntity.ok(loggedInUser.get());
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("خطا: اطلاعات ورود نادرست است یا حساب شما مسدود شده است.");
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpSession session) {
+        try {
+            User user = userService.loginUser(loginRequest.username(), loginRequest.password()).orElseThrow(() -> new UserNotFoundException("what .."));
+            session.setAttribute("user", user);
+            return ResponseEntity.ok(user);
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
+        } catch (WrongPasswordException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse(e.getMessage()));
+        } catch (UserBannedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
         }
     }
 
-    /**
-     * خروج از حساب کاربری
-     */
     @PostMapping("/logout")
-    public ResponseEntity<String> logout() {
-        // در ساختار ساده، فرانت‌اند با پاک کردن توکن/اطلاعات کاربر از حافظه خارج می‌شود
-        return ResponseEntity.ok("خروج از سیستم موفقیت‌آمیز بود.");
+    public ResponseEntity<?> logout(HttpSession session) {
+        if (session.getAttribute("user") == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("هیچ کاربری وارد سیستم نشده است"));
+        }
+        session.invalidate();
+        return ResponseEntity.ok(new MessageResponse("خروج از سیستم موفقیت‌آمیز بود."));
     }
 
-    // ==========================================
-    // ۲. بخش علاقه‌مندی‌ها (Favorites)
-    // ==========================================
-
-    /**
-     * افزودن آگهی به علاقه‌مندی‌ها
-     */
     @PostMapping("/{userId}/favorites/{adId}")
-    public ResponseEntity<String> addToFavorites(@PathVariable String userId, @PathVariable String adId) {
-        boolean success = userService.addAdvertisementToFavorites(userId, adId);
-        if (success) {
-            return ResponseEntity.ok("آگهی به لیست علاقه‌مندی‌ها اضافه شد.");
+    public ResponseEntity<?> addToFavorites(@PathVariable String userId, @PathVariable String adId) {
+        try {
+            userService.addAdvertisementToFavorites(userId, adId);
+            return ResponseEntity.ok(new MessageResponse("با موفقیت به علاقه مندی ها اضافه شد"));
+        } catch (UserNotFoundException | AdvertisementNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
+        } catch (AdAlreadyFavoriteException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
+
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("عملیات ناموفق بود.");
     }
 
-    /**
-     * حذف آگهی از علاقه‌مندی‌ها
-     */
     @DeleteMapping("/{userId}/favorites/{adId}")
-    public ResponseEntity<String> removeFromFavorites(@PathVariable String userId, @PathVariable String adId) {
-        boolean success = userService.removeAdvertisementFromFavorites(userId, adId);
-        if (success) {
-            return ResponseEntity.ok("آگهی از لیست علاقه‌مندی‌ها حذف شد.");
+    public ResponseEntity<?> removeFromFavorites(@PathVariable String userId, @PathVariable String adId) {
+        try {
+            userService.removeAdvertisementFromFavorites(userId, adId);
+            return ResponseEntity.ok(new MessageResponse("با موفقیت از علاقه مندی ها حذف شد"));
+        } catch (UserNotFoundException | AdvertisementNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
+        } catch (AdNotFavException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("آگهی پیدا نشد.");
     }
 
-    /**
-     * مشاهده لیست علاقه‌مندی‌ها
-     */
     @GetMapping("/{userId}/favorites")
-    public ResponseEntity<List<String>> getFavorites(@PathVariable String userId) {
-        List<String> favoriteIds = userService.getUserFavoriteAdIds(userId);
-        return ResponseEntity.ok(favoriteIds);
-    }
-
-    // ==========================================
-    // ۳. پنل مدیریت سیستم (Admin Operations)
-    // ==========================================
-
-    /**
-     * مشاهده لیست تمام کاربران توسط مدیر
-     * GET http://localhost:8080/api/users/admin/all
-     */
-    @GetMapping("/admin/all")
-    public ResponseEntity<List<User>> getAllUsersForAdmin() {
-        // TODO: در آینده باید بررسی شود که درخواست دهنده حتماً نقش ADMIN داشته باشد.
-        List<User> users = userService.getAllUsersForAdmin();
-        return ResponseEntity.ok(users);
-    }
-
-    /**
-     * مسدود کردن کاربر متخلف توسط مدیر
-     */
-    @PutMapping("/admin/block/{userId}")
-    public ResponseEntity<String> blockUser(@PathVariable String userId) {
-        boolean success = userService.blockUser(userId);
-        if (success) {
-            return ResponseEntity.ok("کاربر با موفقیت مسدود شد.");
+    public ResponseEntity<?> getFavorites(@PathVariable String userId) {
+        try {
+            List<String> list = userService.getUserFavoriteAdIds(userId);
+            return ResponseEntity.ok(list);
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("کاربر یافت نشد.");
     }
 
-    /**
-     * فعال‌سازی مجدد کاربر مسدود شده توسط مدیر
-     */
-    @PutMapping("/admin/unblock/{userId}")
-    public ResponseEntity<String> unblockUser(@PathVariable String userId) {
-        boolean success = userService.unblockUser(userId);
-        if (success) {
-            return ResponseEntity.ok("حساب کاربر مجدداً فعال شد.");
+    @GetMapping("/admin/all-users")
+    public ResponseEntity<?> getAllUsersForAdmin(HttpSession session) {
+        try {
+            User currentUser = (User) session.getAttribute("user");
+            if (currentUser == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new ErrorResponse("لطفاً ابتدا وارد سیستم شوید."));
+            }
+            List<User> list = userService.getAllUsersForAdmin(currentUser.getId());
+            return ResponseEntity.ok(list);
+        } catch (NoAcceessException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("کاربر یافت نشد.");
+    }
+
+    @PatchMapping("/admin/block/{userId}")
+    public ResponseEntity<?> blockUser(@PathVariable String userId, HttpSession session) {
+        try {
+            User currentUser = (User) session.getAttribute("user");
+            if (currentUser == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new ErrorResponse("لطفاً ابتدا وارد سیستم شوید."));
+            }
+
+            userService.blockUser(userId, currentUser.getId());
+            return ResponseEntity.ok(new MessageResponse("کاربر با موفقیت مسدود شد"));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
+        } catch (NoAcceessException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
+    /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @PatchMapping("/admin/unblock/{userId}")
+    public ResponseEntity<?> unblockUser(@PathVariable String userId, HttpSession session) {
+        try {
+            User currentUser = (User) session.getAttribute("user");
+            if (currentUser == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new ErrorResponse("لطفاً ابتدا وارد سیستم شوید."));
+            }
+
+            userService.unblockUser(userId, currentUser.getId());
+            return ResponseEntity.ok(new MessageResponse("کاربر با موفقیت رفع مسدودیت شد"));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
+        } catch (NoAcceessException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
+
+        }
     }
 }
