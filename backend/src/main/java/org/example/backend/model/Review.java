@@ -1,7 +1,9 @@
 package org.example.backend.model;
 
-import java.time.LocalDateTime;
+import lombok.Data;
 
+import java.time.LocalDateTime;
+@Data
 public class Review {
 
     //Unique Composite ID layout: "reviewerId_advertisementId"
@@ -16,15 +18,5 @@ public class Review {
     private String comment;          // Optional text review
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public String getId() {
-        return id;
-    }
 
-    public String getReviewerId() {
-        return reviewerId;
-    }
-
-    public String getAdvertisementId() {
-        return advertisementId;
-    }
 }
