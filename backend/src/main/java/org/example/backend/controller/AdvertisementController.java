@@ -1,11 +1,17 @@
 package org.example.backend.controller;
 
+import jakarta.servlet.http.HttpSession;
+import org.example.backend.exeption.*;
+import org.example.backend.model.AdminPendingAdDTO;
 import org.example.backend.model.Advertisement;
+import org.example.backend.model.AdvertisementDetailDTO;
+import org.example.backend.model.User;
 import org.example.backend.service.AdvertisementService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,129 +21,204 @@ public class AdvertisementController {
 
     private final AdvertisementService advertisementService;
 
+
     public AdvertisementController(AdvertisementService advertisementService) {
         this.advertisementService = advertisementService;
     }
-
-    // ==========================================
-    // ۱. عملیات کاربران عادی (صفحه اصلی و بازارچه)
-    // ==========================================
-
-    /**
-     * سناریوی مشاهده، جستجو و فیلتر آگهی‌ها (فقط آگهی‌های ACTIVE)
-     * GET http://localhost:8080/api/advertisements/search
-     */
+///////////////////////////////////////////////////////////////////////////
     @GetMapping("/search")
-    public ResponseEntity<List<Advertisement>> searchAds(
+    public ResponseEntity<?> searchAds(HttpSession session,
             @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String categoryId,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) Double minPrice,
             @RequestParam(required = false) Double maxPrice) {
-
-        List<Advertisement> results = advertisementService.searchAndFilterActiveAds(keyword, category, city, minPrice, maxPrice);
-        return ResponseEntity.ok(results);
-    }
-
-    /**
-     * سناریوی مشاهده جزئیات کامل یک آگهی
-     * GET http://localhost:8080/api/advertisements/{id}
-     */
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getAdDetail(@PathVariable String id) {
-        Optional<Advertisement> ad = advertisementService.getActiveAdvertisementDetail(id);
-        if (ad.isPresent()) {
-            return ResponseEntity.ok(ad.get());
+        User user =(User) session.getAttribute("user");
+        if (user == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("برای جستجو و مشاهده آگهی ها، ابتدا باید وارد سامانه شوید"));
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("خطا: آگهی یافت نشد یا هنوز تایید نشده است.");
+
+            List<Advertisement> chosenAds = advertisementService.searchAndFilterActiveAds(keyword , categoryId , city , minPrice , maxPrice);
+            return ResponseEntity.ok(chosenAds);
+
     }
 
-    /**
-     * سناریوی ثبت آگهی جدید (همراه با وضعیت پیش‌فرض در انتظار بررسی)
-     * POST http://localhost:8080/api/advertisements/create
-     */
+    @GetMapping("/{advertisemetId}")
+    public ResponseEntity<?> getAdDetail(@PathVariable String advertisemetId , HttpSession session) {
+        User user =(User) session.getAttribute("user");
+        if ( user == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("ابتدا وارد سامانه شوید"));
+        }
+
+        try{
+            AdvertisementDetailDTO advertisement = advertisementService.getActiveAdvertisementDetail(advertisemetId , user.getId());
+            return ResponseEntity.ok(advertisement);
+
+        }catch (UserNotFoundException | AdvertisementNotFoundException e ){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
+        }catch(UserBannedException| IllegalArgumentException  e){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
+
     @PostMapping("/create")
-    public ResponseEntity<String> createAd(@RequestBody Advertisement advertisement, @RequestParam List<String> imageUrls) {
-        // اعتبار سنجی قیمت منفی در این بخش کنترل می‌شود
-        if (advertisement.getPrice() != null && advertisement.getPrice() < 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("خطا: قیمت وارد شده معتبر نیست.");
+    public ResponseEntity<?> createAd(@RequestBody Advertisement advertisement, @RequestParam(required = false) List<String> imageUrls , HttpSession session) {
+        User loggedInUser = (User) session.getAttribute("user");
+        if (loggedInUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("لطفاً ابتدا وارد حساب کاربری خود شوید"));
         }
-        advertisementService.createNewAdvertisement(advertisement, imageUrls);
-        return ResponseEntity.status(HttpStatus.CREATED).body("آگهی با موفقیت ثبت شد و در انتظار بررسی مدیر است.");
+        List<String> safeImageUrls = (imageUrls != null) ? imageUrls : new ArrayList<>();
+         try{
+             advertisementService.createNewAdvertisement(advertisement , safeImageUrls, loggedInUser.getId());
+             return ResponseEntity.ok(new MessageResponse("اگهی با موفقیت در صف بررسی قرار گرفت"));
+         }catch (UserNotFoundException e){
+             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
+         }catch (UserBannedException e ){
+             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
+         }catch(PriceNegativeException | TitleInvalidException | InvalidCategoryIdException | IllegalArgumentException e){
+             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
+         }catch (Exception e) {
+             // ۴. یک تور نجات کلی برای خطاهای پیش‌بینی نشده
+             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                     .body(new ErrorResponse("خطای سیستمی رخ داده است: " + e.getMessage()));
+         }
     }
 
-    /**
-     * ویرایش آگهی توسط خود کاربر
-     */
-    @PutMapping("/own/{adId}")
-    public ResponseEntity<String> editOwnAd(@PathVariable String adId, @RequestParam String userId, @RequestBody Advertisement updatedAd) {
-        boolean success = advertisementService.updateOwnAdvertisement(adId, userId, updatedAd);
-        if (success) return ResponseEntity.ok("آگهی با موفقیت ویرایش شد.");
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("خطا: شما اجازه ویرایش این آگهی را ندارید.");
+    @PutMapping("/own/{advertisementId}")
+    public ResponseEntity<?> editOwnAd(@PathVariable String advertisementId,@RequestBody Advertisement updatedAd , HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if ( user == null ){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("کاربر نامعتبر است");
+        }
+        if ( advertisementId == null || !advertisementId.equals(updatedAd.getId())){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("اگهی نامعتبر است");
+        }
+
+        try{
+            advertisementService.updateOwnAdvertisement(user.getId(), updatedAd);
+            return ResponseEntity.ok().body(new MessageResponse("اگهی  با موفقیت به روز رسانی شد"));
+        }catch (IllegalArgumentException |InvalidAdvertisementIdException|
+                TitleInvalidException | PriceNegativeException | InvalidCategoryIdException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
+        }catch(AdvertisementNotFoundException |UserNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
+        }catch ( UserBannedException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse(e.getMessage()));
+        }catch (NoAcceessException  e){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
+        }
     }
 
-    /**
-     * حذف آگهی توسط خود کاربر
-     */
+
     @DeleteMapping("/own/{adId}")
-    public ResponseEntity<String> deleteOwnAd(@PathVariable String adId, @RequestParam String userId) {
-        boolean success = advertisementService.deleteOwnAdvertisement(adId, userId);
-        if (success) return ResponseEntity.ok("آگهی با موفقیت حذف شد.");
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("خطا: شما اجازه حذف این آگهی را ندارید.");
+    public ResponseEntity<?> deleteOwnAd(@PathVariable String adId, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if ( user == null ){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("ابتدا وارد شوید"));
+        }
+        try{
+            advertisementService.deleteOwnAdvertisement(adId, user.getId());
+            return ResponseEntity.ok(new MessageResponse("اگهی با موفقیت حذف شد"));
+        }catch (InvalidAdvertisementIdException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
+        }catch (AdvertisementNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
+        }catch( NoAcceessException e){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
+        }
+
+
     }
 
-    /**
-     * تغییر وضعیت آگهی به فروخته شده توسط مالک
-     * PATCH http://localhost:8080/api/advertisements/own/{adId}/sold
-     */
     @PatchMapping("/own/{adId}/sold")
-    public ResponseEntity<String> markAsSold(@PathVariable String adId, @RequestParam String userId) {
-        boolean success = advertisementService.changeAdStatusToSold(adId, userId);
-        if (success) return ResponseEntity.ok("وضعیت آگهی به فروخته‌شده تغییر کرد.");
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("خطا: عملیات غیرمجاز.");
+    public ResponseEntity<?> markAsSold(@PathVariable String adId, HttpSession session ) {
+        User user = (User) session.getAttribute("user");
+        if ( user == null ){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("ابتدا وارد شوید"));
+        }
+        try{
+            advertisementService.changeAdStatusToSold(adId , user.getId());
+            return ResponseEntity.ok(new MessageResponse("اگهی به فروخته شده تغییر پیدا کرد"));
+        }catch (InvalidAdvertisementIdException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
+        }catch (AdvertisementNotFoundException| UserNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
+        }catch(NoAcceessException e){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
+        }catch (UserBannedException |IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
+        }
     }
-
-    // ==========================================
-    // ۲. عملیات پنل مدیریت (Admin Dashboard)
-    // ==========================================
-
-    /**
-     * مشاهده لیست آگهی‌های در انتظار بررسی توسط مدیر
-     * GET http://localhost:8080/api/advertisements/admin/pending
-     */
     @GetMapping("/admin/pending")
-    public ResponseEntity<List<Advertisement>> getPendingAdsForAdmin() {
-        List<Advertisement> pendingAds = advertisementService.getPendingAdvertisementsForAdmin();
-        return ResponseEntity.ok(pendingAds);
+    public ResponseEntity<?> getPendingAdsForAdmin(HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if ( user == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("ابتدا وارد شوید"));
+        }
+        try {
+            List<AdminPendingAdDTO> ads = advertisementService.getPendingAdvertisementsForAdmin(user.getId());
+            return ResponseEntity.ok(ads);
+        }catch (UserNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
+        }catch(NoAcceessException e){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
+        }
     }
 
-    /**
-     * تایید آگهی توسط مدیر
-     */
-    @PostMapping("/admin/{adId}/approve")
-    public ResponseEntity<String> approveAd(@PathVariable String adId) {
-        boolean success = advertisementService.approveAdvertisement(adId);
-        if (success) return ResponseEntity.ok("آگهی تایید شد و به لیست عمومی اضافه گردید.");
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("آگهی پیدا نشد.");
+    @PostMapping("/admin/{advertisementId}/approve")
+    public ResponseEntity<?> approveAd(@PathVariable String advertisementId , HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if ( user == null ){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("ابتدا وارد شوید"));
+        }
+        try{
+            advertisementService.approveAdvertisement(advertisementId , user.getId());
+            return ResponseEntity.ok(new MessageResponse("اگهی تایید شد"));
+        }catch (UserNotFoundException | AdvertisementNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
+        }catch (NoAcceessException e){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
+        }catch (AdvertisementStatusException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
+        }
     }
 
-    /**
-     * رد آگهی توسط مدیر همراه با ثبت دلیل رد
-     */
-    @PostMapping("/admin/{adId}/reject")
-    public ResponseEntity<String> rejectAd(@PathVariable String adId, @RequestParam String reason) {
-        boolean success = advertisementService.rejectAdvertisement(adId, reason);
-        if (success) return ResponseEntity.ok("آگهی رد شد و دلیل آن ثبت گردید.");
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("آگهی پیدا نشد.");
+    @PostMapping("/admin/{advertisementId}/reject")
+    public ResponseEntity<?> rejectAd(@PathVariable String advertisementId, @RequestParam String reason, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if ( user == null ){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("ابتدا وارد شوید"));
+        }
+
+        try {
+            advertisementService.rejectAdvertisement(advertisementId , reason , user.getId());
+            return ResponseEntity.ok(new MessageResponse("اگهی رد شد"));
+        }catch (UserNotFoundException|AdvertisementNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
+        }catch (NoAcceessException e){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
+        }catch (AdvertisementStatusException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
+        }
     }
 
-    /**
-     * حذف آگهی نامناسب توسط مدیر
-     */
-    @DeleteMapping("/admin/{adId}")
-    public ResponseEntity<String> deleteInappropriateAd(@PathVariable String adId) {
-        boolean success = advertisementService.deleteInappropriateAdByAdmin(adId);
-        if (success) return ResponseEntity.ok("آگهی نامناسب با موفقیت توسط مدیریت حذف شد.");
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("آگهی پیدا نشد.");
+    @DeleteMapping("/admin/{advertisementId}")
+    public ResponseEntity<?> deleteInappropriateAd(@PathVariable String advertisementId , HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if ( user == null ){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("ابتدا وارد شوید"));
+        }
+        try{
+            advertisementService.deleteInappropriateAdByAdmin(advertisementId , user.getId());
+            return ResponseEntity.ok(new MessageResponse("اگهی با موفقیت توسط ادمین حدف شد"));
+        }catch(UserNotFoundException | AdvertisementNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
+        }catch (NoAcceessException e){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
+        }
     }
 }

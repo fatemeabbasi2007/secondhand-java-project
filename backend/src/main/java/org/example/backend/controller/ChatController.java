@@ -1,7 +1,11 @@
 package org.example.backend.controller;
 
+import jakarta.servlet.http.HttpSession;
+import org.example.backend.exeption.*;
 import org.example.backend.model.Conversation;
+import org.example.backend.model.ConversationPreviewDTO;
 import org.example.backend.model.Message;
+import org.example.backend.model.User;
 import org.example.backend.service.ChatService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,48 +24,59 @@ public class ChatController {
         this.chatService = chatService;
     }
 
-    /**
-     * سناریوی شروع یک چت جدید یا ارسال پیام درون یک آگهی
-     * POST http://localhost:8080/api/chats/send
-     */
+
     @PostMapping("/send")
     public ResponseEntity<?> sendMessage(
             @RequestParam String advertisementId,
-            @RequestParam String buyerId,
-            @RequestParam String sellerId,
-            @RequestParam String messageText) {
+            @RequestBody Message message ,
+            HttpSession session) {
+        User loggedInUser = (User) session.getAttribute("user");
+        if (loggedInUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("ابتدا وارد سامانه شوید"));
+        }
+        try{
+            chatService.startOrSendMessage(advertisementId , loggedInUser.getId(), message);
+            return ResponseEntity.ok(new MessageResponse("پیام فرستاده شد"));
+        }catch (InvalidMessageException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
+        } catch (AdvertisementNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
+        } catch (SameSellerAndBuyerIdExcpetion | UserBannedException | NoAcceessException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
+        }
+    }
 
-        // بررسی اولیه برای قرارداد (کاربر نمی‌تواند به آگهی خودش پیام دهد)
-        if (buyerId.equals(sellerId)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("خطا: شما نمی‌توانید به آگهی خودتان پیام ارسال کنید.");
+    @GetMapping("/conversations/")
+    public ResponseEntity<?> getUserInbox(HttpSession session) {
+        User loggedInUser = (User) session.getAttribute("user");
+        if (loggedInUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("ابتدا وارد سامانه شوید"));
+        }
+        try{
+            List<ConversationPreviewDTO> inbox = chatService.getUserConversations(loggedInUser.getId());
+            return ResponseEntity.ok(inbox);        }catch(UserNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
+        }catch (UserBannedException e){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
+    @GetMapping("/conversations/{conversationId}/messages")
+    public ResponseEntity<?> getChatHistory(@PathVariable String conversationId, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if ( user == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("ابتدا وارد شوید"));
+        }
+        try{
+            List<Message> messages = chatService.getMessagesInConversation(conversationId , user.getId());
+            return ResponseEntity.ok(messages);
+        }catch (NoAcceessException|UserBannedException e){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
+        }catch (UserNotFoundException| ConversationNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
         }
 
-        Optional<Conversation> conversation = chatService.startOrSendMessage(advertisementId, buyerId, sellerId, messageText);
-
-        // در حالت ماک (قرارداد)، یک پاسخ فرضی موفق می‌دهیم تا فرانت‌اندمعطل نماند
-        return ResponseEntity.ok("پیام با موفقیت ارسال و ثبت شد.");
-    }
-
-    /**
-     * سناریوی مشاهده لیست گفتگوهای خود (صندوق ورودی چت‌ها)
-     * فرانت‌اند لیست تمام چت‌های کاربر آنلاین را می‌گیرد تا در لیست چت‌ها نشان دهد.
-     * GET http://localhost:8080/api/chats/user/{userId}
-     */
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Conversation>> getUserInbox(@PathVariable String userId) {
-        List<Conversation> conversations = chatService.getUserConversations(userId);
-        return ResponseEntity.ok(conversations);
-    }
-
-    /**
-     * سناریوی مشاهده پیام‌ها (باز کردن چت اختصاصی)
-     * دریافت تمام پیام‌های داخل یک گفتگوی خاص به ترتیب زمانی
-     * GET http://localhost:8080/api/chats/{conversationId}/messages
-     */
-    @GetMapping("/{conversationId}/messages")
-    public ResponseEntity<List<Message>> getChatHistory(@PathVariable String conversationId) {
-        List<Message> messages = chatService.getMessagesInConversation(conversationId);
-        return ResponseEntity.ok(messages);
     }
 }
