@@ -1,6 +1,10 @@
 package org.example.backend.controller;
 
+import jakarta.servlet.http.HttpSession;
+import org.example.backend.exeption.*;
 import org.example.backend.model.Review;
+import org.example.backend.model.ReviewDTO;
+import org.example.backend.model.User;
 import org.example.backend.service.ReviewService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,38 +22,44 @@ public class ReviewController {
         this.reviewService = reviewService;
     }
 
-    /**
-     * سناریوی ثبت امتیاز و نظر جدید برای فروشنده
-     * POST http://localhost:8080/api/reviews/submit
-     */
-    @PostMapping("/submit")
-    public ResponseEntity<String> submitReview(@RequestBody Review review) {
 
-        // بررسی اولیه محدوده امتیاز برای رعایت قرارداد خطاها
-        if (review.getRating() < 1 || review.getRating() > 5) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("خطا: امتیاز باید بین ۱ تا ۵ باشد.");
+    @PostMapping("/submit/{advertisementId}")
+    public ResponseEntity<?> submitReview(@RequestBody ReviewDTO reviewDto , @PathVariable String advertisementId , HttpSession session) {
+        User loggedUser = (User) session.getAttribute("user");
+        if ( loggedUser == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("ایتدا وارد شوید"));
         }
 
-        if (review.getReviewerId().equals(review.getTargetUserId())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("خطا: کاربر نمی‌تواند به خودش امتیاز دهد.");
+        try{
+            reviewService.submitReview(reviewDto , loggedUser.getId() , advertisementId);
+            return ResponseEntity.ok(new MessageResponse("نظر شما با موفقیت ثبت شد"));
+        }catch (InvalidScoreException |ReviewAlreadyExistsException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
+        }catch(UserNotFoundException | AdvertisementNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
+        }catch (UserBannedException | NoAcceessException e){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
         }
-
-        boolean success = reviewService.submitReview(review);
-        if (success) {
-            return ResponseEntity.status(HttpStatus.CREATED).body("امتیاز و نظر شما با موفقیت ثبت شد.");
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("خطا: شما قبلاً برای این آگهی نظر ثبت کرده‌اید.");
     }
 
     /**
      * مشاهده نظرات و امتیازهای یک فروشنده در صفحه پروفایل او
      * GET http://localhost:8080/api/reviews/user/{username}
      */
-    @GetMapping("/user/{username}")
-    public ResponseEntity<List<Review>> getUserReviews(@PathVariable String username) {
-        List<Review> reviews = reviewService.getReviewsForUser(username);
-        return ResponseEntity.ok(reviews);
+    @GetMapping("/user/{sellerId}/reviews")
+    public ResponseEntity<?> getUserReviews(@PathVariable String sellerId , HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if ( user == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("کاربر یافت نشد"));
+        }
+        try{
+            List<Review> reviews = reviewService.getReviewsForUser(sellerId ,user.getId() );
+            return ResponseEntity.ok(reviews);
+        }catch(UserNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
+        }catch (UserBannedException e){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
+        }
+
     }
 }
