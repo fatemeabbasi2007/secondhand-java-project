@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.Button?>
+
+<VBox alignment="CENTER" spacing="20.0" prefWidth="600.0" prefHeight="400.0"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.frontend.controller.MainController">
+
+    <Label text="به برنامه خرید و فروش کالای دست دوم خوش آمدید! 🎉">
+        <font>
+            <Font name="System Bold" size="20.0" />
+        </font>
+    </Label>
+
+    <Label text="اینجا صفحه اصلی برنامه شما خواهد بود." />
+
+    <Button text="خروج از حساب" onAction="#handleLogout" style="-fx-background-color: red; -fx-text-fill: white;"/>
+</VBox>
