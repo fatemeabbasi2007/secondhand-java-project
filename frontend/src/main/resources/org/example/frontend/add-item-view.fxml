@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.frontend.controller.AddItemController">
+
+    <padding>
+        <Insets top="25.0" right="25.0" bottom="25.0" left="25.0"/>
+    </padding>
+
+    <Label text="ثبت مشخصات آگهی جدید" textFill="#2F3542">
+        <font>
+            <Font name="System Bold" size="18.0" />
+        </font>
+    </Label>
+
+    <VBox spacing="5.0">
+        <Label text="عنوان آگهی" textFill="#57606F" />
+        <TextField fx:id="titleField" promptText="مثال: لپ‌تاپ لنوو در حد نو"
+                   style="-fx-background-color: #F1F2F6; -fx-background-radius: 5; -fx-padding: 8;"/>
+    </VBox>
+
+    <VBox spacing="5.0">
+        <Label text="دسته‌بندی" textFill="#57606F" />
+        <ComboBox fx:id="categoryComboBox" promptText="انتخاب کنید..." prefWidth="300.0"
+                  style="-fx-background-color: #F1F2F6; -fx-background-radius: 5;"/>
+    </VBox>
+
+    <VBox spacing="5.0">
+        <Label text="شهر" textFill="#57606F" />
+        <ComboBox fx:id="cityComboBox" promptText="انتخاب کنید..." prefWidth="300.0"
+                  style="-fx-background-color: #F1F2F6; -fx-background-radius: 5;"/>
+    </VBox>
+
+    <VBox spacing="5.0">
+        <Label text="قیمت (تومان)" textFill="#57606F" />
+        <TextField fx:id="priceField" promptText="مثال: ۱۸۰۰۰۰۰۰"
+                   style="-fx-background-color: #F1F2F6; -fx-background-radius: 5; -fx-padding: 8;"/>
+    </VBox>
+
+    <VBox spacing="5.0">
+        <Label text="توضیحات بیشتر" textFill="#57606F" />
+        <TextArea fx:id="descriptionField" promptText="مشخصات ظاهری، مدت کارکرد، لوازم همراه و..." prefHeight="100.0" wrapText="true"
+                  style="-fx-background-color: #F1F2F6; -fx-background-radius: 5;"/>
+    </VBox>
+
+    <VBox fx:id="extraFieldsContainer" spacing="10.0" alignment="CENTER_RIGHT" />
+
+    <VBox spacing="10.0" alignment="CENTER_LEFT">
+        <Button text="📷 انتخاب تصویر کالا" onAction="#handleChooseImage"
+                style="-fx-background-color: #CED6E0; -fx-text-fill: #2F3542; -fx-font-weight: bold;"/>
+
+        <Label fx:id="imagePathLabel" text="هیچ تصویری انتخاب نشده است" textFill="#747D8C">
+            <font>
+                <Font size="11.0" />
+            </font>
+        </Label>
+    </VBox>
+
+    <Label fx:id="statusLabel" textFill="#FF4757" />
+
+    <Button text="🚀 انتشار آگهی" onAction="#handleAddItem" prefWidth="150.0"
+            style="-fx-background-color: #2ED573; -fx-text-fill: white; -fx-font-size: 14; -fx-font-weight: bold; -fx-background-radius: 5;"/>
+</VBox>
