@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<HBox prefHeight="550.0" prefWidth="800.0" spacing="15.0" style="-fx-background-color: #F5F6FA;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.frontend.controller.AdminController">
+    <padding>
+        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+    </padding>
+    <children>
+
+        <VBox prefWidth="300.0" spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 0);">
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </padding>
+            <children>
+                <Label text="آگهی‌های در انتظار بررسی" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2F3542;" />
+                <Separator />
+                <ListView fx:id="pendingListView" VBox.vgrow="ALWAYS" />
+            </children>
+        </VBox>
+
+        <VBox HBox.hgrow="ALWAYS" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 0);">
+            <padding>
+                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+            </padding>
+            <children>
+                <Label text="جزئیات بررسی آگهی" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #2F3542;" />
+                <Separator />
+
+                <GridPane vgap="10.0" hgap="10.0">
+                    <columnConstraints>
+                        <ColumnConstraints halignment="RIGHT" minWidth="80.0" />
+                        <ColumnConstraints hgrow="ALWAYS" />
+                    </columnConstraints>
+                    <children>
+                        <Label text="عنوان آگهی:" GridPane.columnIndex="1" GridPane.rowIndex="0" style="-fx-font-weight: bold;" />
+                        <Label fx:id="titleLabel" text="-" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+
+                        <Label text="دسته‌بندی:" GridPane.columnIndex="1" GridPane.rowIndex="1" style="-fx-font-weight: bold;" />
+                        <Label fx:id="categoryLabel" text="-" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+
+                        <Label text="شهر:" GridPane.columnIndex="1" GridPane.rowIndex="2" style="-fx-font-weight: bold;" />
+                        <Label fx:id="cityLabel" text="-" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+
+                        <Label text="قیمت:" GridPane.columnIndex="1" GridPane.rowIndex="3" style="-fx-font-weight: bold;" />
+                        <Label fx:id="priceLabel" text="-" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                    </children>
+                </GridPane>
+
+                <Label text="توضیحات آگهی:" style="-fx-font-weight: bold;" />
+                <TextArea fx:id="descriptionArea" editable="false" wrapText="true" prefHeight="100.0" style="-fx-background-color: #F8F9FA;" />
+
+                <Label text="تصویر آگهی:" style="-fx-font-weight: bold;" />
+                <Label fx:id="imageLabel" text="تصویری انتخاب نشده است" style="-fx-text-fill: #747D8C; -fx-font-style: italic;" />
+
+                <Region VBox.vgrow="ALWAYS" />
+                <Separator />
+
+                <HBox spacing="15.0" alignment="CENTER_LEFT">
+                    <children>
+                        <Button fx:id="btnApprove" text="تأیید و انتشار آگهی" onAction="#handleApprove" style="-fx-background-color: #2ED573; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;" prefHeight="35.0" />
+                        <Button fx:id="btnReject" text="رد کردن آگهی" onAction="#handleReject" style="-fx-background-color: #FF4757; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;" prefHeight="35.0" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+
+    </children>
+</HBox>
