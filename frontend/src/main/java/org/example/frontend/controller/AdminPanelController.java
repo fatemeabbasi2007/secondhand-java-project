@@ -138,7 +138,7 @@ public class AdminPanelController {
     public void onApproveClick(ActionEvent event) {
         if (selectedAd == null) return;
         try {
-            adminService.reviewAdvertisement(selectedAd.getId(), true, null);
+            adminService.approveAdvertisement(selectedAd.getId().toString());
             showAlert(Alert.AlertType.INFORMATION, "موفق", "آگهی با موفقیت تایید شد.");
             loadPendingAds();
         } catch (Exception e) {
@@ -158,7 +158,7 @@ public class AdminPanelController {
         reasonField.setStyle("");
 
         try {
-            adminService.reviewAdvertisement(selectedAd.getId(), false, reason);
+            adminService.rejectAdvertisement(selectedAd.getId().toString(), reason);
             showAlert(Alert.AlertType.INFORMATION, "موفق", "آگهی رد شد.");
             loadPendingAds();
         } catch (Exception e) {

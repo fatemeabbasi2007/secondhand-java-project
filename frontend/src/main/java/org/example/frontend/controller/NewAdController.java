@@ -17,6 +17,7 @@ public class NewAdController {
     @FXML private TextField priceField;
     @FXML private TextField cityField;
     @FXML private TextField categoryField;
+    @FXML private TextField imageUrlsField;
 
     private final AdvertisementService adService = new AdvertisementService();
 
@@ -24,7 +25,7 @@ public class NewAdController {
     private Long editingAdId = null;
 
     // این متد برای پر کردن فیلدها در حالت ویرایش از طرف صفحه قبل صدا زده می‌شود
-    public void setAdDataForEdit(Long adId, String title, double price, String city, String category, String description) {
+    public void setAdDataForEdit(Long adId, String title, double price, String city, String category, String description, String text) {
         this.editingAdId = adId;
 
         titleField.setText(title);
@@ -32,6 +33,7 @@ public class NewAdController {
         cityField.setText(city);
         categoryField.setText(category);
         descriptionField.setText(description);
+        imageUrlsField.setText(text);
     }
 
     @FXML
@@ -43,6 +45,7 @@ public class NewAdController {
         String priceStr = priceField.getText().trim();
         String city = cityField.getText().trim();
         String category = categoryField.getText().trim();
+        String urlsText = imageUrlsField.getText().trim();
 
         boolean hasError = false;
 
@@ -51,6 +54,7 @@ public class NewAdController {
         if (description.isEmpty()) { descriptionField.setStyle("-fx-border-color: red; -fx-border-width: 1.5px;"); hasError = true; }
         if (city.isEmpty()) { cityField.setStyle("-fx-border-color: red; -fx-border-width: 1.5px;"); hasError = true; }
         if (category.isEmpty()) { categoryField.setStyle("-fx-border-color: red; -fx-border-width: 1.5px;"); hasError = true; }
+        if (urlsText.isEmpty()) { imageUrlsField.setStyle("-fx-border-color: red; -fx-border-width: 1.5px;"); hasError = true; }
 
         double price = 0;
         if (priceStr.isEmpty()) {
@@ -67,21 +71,37 @@ public class NewAdController {
             }
         }
 
+        if (hasError) return; // توقف متد در صورت وجود خطا در فیلدها
+
         double pricee = Double.parseDouble(priceStr);
 
+        //  تبدیل متن فیلد عکس‌ها (جدا شده با ویرگول) به List<String>
+
+        java.util.List<String> imageUrlsList = new java.util.ArrayList<>();
+        if (!urlsText.isEmpty()) {
+            for (String url : urlsText.split(",")) {
+                if (!url.trim().isEmpty()) {
+                    imageUrlsList.add(url.trim());
+                }
+            }
+        }
+
         try {
-            // بخش اصلی :
+            // بخش اصلی
             if (editingAdId != null) {
                 // اگر متغیر آی‌دی خالی نبود، یعنی در حال ویرایش هستیم:
-                adService.updateAdvertisement(editingAdId, title, description, pricee, city, category);
+                //  پاس دادن لیست عکس‌ها به متد ویرایش
+                adService.updateAdvertisement(editingAdId, title, description, pricee, city, category, imageUrlsList);
                 showAlert(Alert.AlertType.INFORMATION, "موفق", "تغییرات آگهی با موفقیت ذخیره شد.");
             } else {
                 // اگر خالی بود، یعنی کاربر دارد آگهی جدید ثبت می‌کند:
-                adService.createAdvertisement(title, description, pricee, city, category);
-                showAlert(Alert.AlertType.INFORMATION, "موفق", "آگهی با موفقیت ثبت شد و در انتظار بررسی مدیر قرار گرفت.");
+                //  پاس دادن لیست عکس‌ها به متد ساخت آگهی جدید
+                adService.createAdvertisement(title, description, pricee, city, category, imageUrlsList);
+                showAlert(Alert.AlertType.INFORMATION, "موفق","آگهی با موفقیت ثبت شد و در انتظار بررسی مدیر قرار گرفت.");
             }
 
-            clearFields();
+            clearFields(); //
+            imageUrlsField.clear(); // ◄ ۴. پاک کردن فیلد عکس‌ها بعد از موفقیت
             editingAdId = null; // ریست کردن وضعیت به حالت عادی بعد از موفقیت
 
             // بازگشت خودکار به صفحه اصلی بعد از ثبت یا ویرایش

@@ -36,6 +36,7 @@
         <Label style="-fx-font-weight: bold;" text="قیمت:" />
         <Label fx:id="priceLabel" text="-" />
         <Label fx:id="cityLabel" text="-" />
+        <Label fx:id="imageLabel" text="-" />
         <Label fx:id="categoryLabel" text="-" />
         <HBox alignment="CENTER_LEFT" spacing="10" GridPane.columnIndex="2">
             <Label fx:id="ownerLabel" text="-" />

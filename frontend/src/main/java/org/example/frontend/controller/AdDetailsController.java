@@ -9,6 +9,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.event.ActionEvent;
 
+import java.util.stream.Collectors;
+
 public class AdDetailsController {
 
     @FXML private Label titleLabel;
@@ -19,7 +21,7 @@ public class AdDetailsController {
     @FXML private Label ratingLabel;
     @FXML private Label statusLabel;
     @FXML private TextArea descriptionArea;
-
+    @FXML private Label imageLabel;
     @FXML private HBox buyerActionsBox;
     @FXML private HBox ownerActionsBox;
 
@@ -50,6 +52,7 @@ public class AdDetailsController {
             ownerLabel.setText(ad.getOwnerUsername());
             ratingLabel.setText(String.format("(امتیاز: %.1f ★)", ad.getOwnerAverageRating()));
             statusLabel.setText(ad.getStatus());
+            imageLabel.setText(ad.getImageUrlsList().stream().collect(Collectors.joining(" ,")));
 
             // مقایسه مالکیت آگهی با کاربر فعلی
             Long currentUserId = SessionManager.getInstance().getUserId();
@@ -136,7 +139,8 @@ public class AdDetailsController {
                     Double.parseDouble(priceLabel.getText().replaceAll("[^0-9]", "")), // استخراج فقط عدد از متن قیمت
                     cityLabel.getText(),
                     categoryLabel.getText(),
-                    descriptionArea.getText()
+                    descriptionArea.getText(),
+                    imageLabel.getText()
             );
 
             stage.setScene(new javafx.scene.Scene(root));

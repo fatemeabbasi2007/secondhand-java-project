@@ -1,23 +1,25 @@
 package org.example.frontend.model;
 
+import java.time.LocalDateTime;
+
 public class ConversationResponse {
     private Long conversationId;
     private Long advertisementId;
-    private String advertisementTitle;
+    private String title;
     private String otherPartyUsername;
-    private String lastMessage;
-    private String lastMessageTime;
+    private String lastMessagePreview;
+    private LocalDateTime lastMessageAt;
 
     public ConversationResponse() {}
 
     public ConversationResponse(Long conversationId, Long advertisementId, String advertisementTitle,
-                                String otherPartyUsername, String lastMessage, String lastMessageTime) {
+                                String otherPartyUsername, String lastMessage, LocalDateTime lastMessageTime) {
         this.conversationId = conversationId;
         this.advertisementId = advertisementId;
-        this.advertisementTitle = advertisementTitle;
+        this.title = advertisementTitle;
         this.otherPartyUsername = otherPartyUsername;
-        this.lastMessage = lastMessage;
-        this.lastMessageTime = lastMessageTime;
+        this.lastMessagePreview = lastMessage;
+        this.lastMessageAt = lastMessageTime;
     }
 
     public Long getConversationId() { return conversationId; }
@@ -26,15 +28,15 @@ public class ConversationResponse {
     public Long getAdvertisementId() { return advertisementId; }
     public void setAdvertisementId(Long advertisementId) { this.advertisementId = advertisementId; }
 
-    public String getAdvertisementTitle() { return advertisementTitle; }
-    public void setAdvertisementTitle(String advertisementTitle) { this.advertisementTitle = advertisementTitle; }
+    public String getAdvertisementTitle() { return title; }
+    public void setAdvertisementTitle(String advertisementTitle) { this.title = advertisementTitle; }
 
     public String getOtherPartyUsername() { return otherPartyUsername; }
     public void setOtherPartyUsername(String otherPartyUsername) { this.otherPartyUsername = otherPartyUsername; }
 
-    public String getLastMessage() { return lastMessage; }
-    public void setLastMessage(String lastMessage) { this.lastMessage = lastMessage; }
+    public String getLastMessagePreview() { return lastMessagePreview; }
+    public void setLastMessagePreview(String lastMessagePreview) { this.lastMessagePreview = lastMessagePreview; }
 
-    public String getLastMessageTime() { return lastMessageTime; }
-    public void setLastMessageTime(String lastMessageTime) { this.lastMessageTime = lastMessageTime; }
+    public LocalDateTime getLastMessageTime() { return lastMessageAt; }
+    public void setLastMessageTime(LocalDateTime lastMessageTime) { this.lastMessageAt = lastMessageTime; }
 }

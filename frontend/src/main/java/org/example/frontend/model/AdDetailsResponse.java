@@ -1,5 +1,7 @@
 package org.example.frontend.model;
 
+import java.util.List;
+
 public class AdDetailsResponse {
     private Long id;
     private String title;
@@ -10,7 +12,8 @@ public class AdDetailsResponse {
     private Long ownerId;
     private String ownerUsername;
     private double ownerAverageRating; // میانگین امتیاز فروشنده (مرحله ۵)
-    private String status; // وضعیت آگهی (ACTIVE, SOLD, PENDING و غیره)
+    private String status;// وضعیت آگهی (ACTIVE, SOLD, PENDING و غیره)
+    private List<String> imageUrlsList;
 
     public AdDetailsResponse() {}
 
@@ -58,4 +61,7 @@ public class AdDetailsResponse {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public List<String> getImageUrlsList() {return imageUrlsList;}
+    public void setImageUrlsList(List<String> imageUrlsList) {this.imageUrlsList = imageUrlsList;}
 }
