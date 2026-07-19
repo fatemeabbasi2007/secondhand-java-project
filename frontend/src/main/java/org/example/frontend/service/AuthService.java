@@ -26,7 +26,7 @@ public class AuthService {
         String jsonBody = objectMapper.writeValueAsString(registerRequest);
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(ApiConfig.BASE_URL + "/api/auth/register"))
+                .uri(URI.create(ApiConfig.BASE_URL + "/api/users/register"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                 .build();
@@ -53,7 +53,7 @@ public class AuthService {
         String jsonBody = objectMapper.writeValueAsString(loginRequest);
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(ApiConfig.BASE_URL + "/api/auth/login"))
+                .uri(URI.create(ApiConfig.BASE_URL + "/api/users/login"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                 .build();
@@ -74,6 +74,26 @@ public class AuthService {
                     throw new Exception(response.body());
                 }
                 throw new Exception("خطای ناشناخته از سمت سرور با کد: " + response.statusCode());
+            }
+        }
+    }
+
+    public void logout() throws Exception {
+        // ارسال درخواست POST به سرور برای باطل کردن سشن
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(ApiConfig.BASE_URL + "/api/users/logout"))
+                .POST(HttpRequest.BodyPublishers.noBody()) // چون متد @PostMapping است و بدنه نمی‌خواهد
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        // اگر سرور خطا داد (مثلاً کاربر اصلاً لاگین نبوده)
+        if (response.statusCode() != 200) {
+            try {
+                ErrorResponse error = objectMapper.readValue(response.body(), ErrorResponse.class);
+                throw new Exception(error.getMessage());
+            } catch (Exception e) {
+                throw new Exception("خطا در خروج از سیستم. کد وضعیت: " + response.statusCode());
             }
         }
     }

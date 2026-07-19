@@ -231,6 +231,34 @@ public class AdDetailsController {
     }
 
     @FXML
+    public void onMarkAsSoldClick(ActionEvent event) {
+        if (currentAdId == null) return;
+
+        // نمایش پیام تایید قبل از تغییر وضعیت
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle("تأیید تغییر وضعیت");
+        confirmAlert.setHeaderText("آیا از تغییر وضعیت این آگهی به «فروخته شده» اطمینان دارید؟");
+        confirmAlert.setContentText("با این کار، آگهی دیگر در لیست عمومی نمایش داده نخواهد شد.");
+
+        confirmAlert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try {
+                    // ۱. فرستادن درخواست موازی/همگام به سرور
+                    adService.markAsSold(currentAdId);
+
+                    showAlert(Alert.AlertType.INFORMATION, "موفقیت", "وضعیت آگهی با موفقیت به «فروخته شده» تغییر یافت.");
+
+                    // ۲. به‌روزرسانی پویای صفحه برای نمایش وضعیت جدید
+                    loadAdDetails();
+
+                } catch (Exception e) {
+                    showAlert(Alert.AlertType.ERROR, "خطا در تغییر وضعیت", e.getMessage());
+                }
+            }
+        });
+    }
+
+    @FXML
     public void onBackClick(ActionEvent event) {
         NavigationService.navigate(event, "main-view.fxml", "صفحه اصلی آگهی‌ها");
     }
