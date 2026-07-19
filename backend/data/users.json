@@ -1,0 +1,12 @@
+[ {
+  "id" : "6434369c-88e4-4907-be1e-30f58b86bd31",
+  "username" : "my_new_user",
+  "password" : "my_password123",
+  "email" : "f.abbasi@hello.com",
+  "phoneNum" : "09123715596",
+  "role" : "ADMIN",
+  "enabled" : true,
+  "favoriteAdIds" : [ ],
+  "averageRating" : 0.0,
+  "totalRatingsCount" : 0
+} ]
