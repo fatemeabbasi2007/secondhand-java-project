@@ -23,7 +23,7 @@ public class FavoriteService {
         this.objectMapper = new ObjectMapper();
     }
 
-    // ۱. افزودن آگهی به علاقه‌مندی‌ها (مرحله ۲ و ۳ سناریو)
+    //  افزودن آگهی به علاقه‌مندی‌ها
     public void addToFavorites(Long adId) throws Exception {
         String token = SessionManager.getInstance().getToken();
         if (token == null) throw new Exception("لطفاً ابتدا وارد حساب کاربری خود شوید.");
@@ -41,7 +41,7 @@ public class FavoriteService {
         }
     }
 
-    // ۲. دریافت لیست علاقه‌مندی‌های کاربر (مرحله ۶ سناریو)
+    //  دریافت لیست علاقه‌مندی‌های کاربر
     public List<FavoriteResponse> getFavorites() throws Exception {
         String token = SessionManager.getInstance().getToken();
         if (token == null) throw new Exception("لطفاً ابتدا وارد حساب کاربری خود شوید.");
@@ -62,7 +62,7 @@ public class FavoriteService {
         }
     }
 
-    // ۳. حذف آگهی از لیست علاقه‌مندی‌ها (مرحله ۷ سناریو)
+    //  حذف آگهی از لیست علاقه‌مندی‌ها
     public void removeFromFavorites(Long favoriteId) throws Exception {
         String token = SessionManager.getInstance().getToken();
         if (token == null) throw new Exception("لطفاً ابتدا وارد حساب کاربری خود شوید.");

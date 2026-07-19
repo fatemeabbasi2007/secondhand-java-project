@@ -42,7 +42,7 @@ public class AdDetailsController {
         try {
             AdDetailsResponse ad = adService.getAdvertisementDetails(currentAdId);
 
-            // نمایش فیلدها (مرحله ۴ و ۵ سناریو)
+            // نمایش فیلدها
             titleLabel.setText(ad.getTitle());
             priceLabel.setText(String.format("%,.0f تومان", ad.getPrice()));
             cityLabel.setText(ad.getCity());
@@ -51,7 +51,7 @@ public class AdDetailsController {
             ratingLabel.setText(String.format("(امتیاز: %.1f ★)", ad.getOwnerAverageRating()));
             statusLabel.setText(ad.getStatus());
 
-            // مقایسه مالکیت آگهی با کاربر فعلی (بخش پایانی سناریو)
+            // مقایسه مالکیت آگهی با کاربر فعلی
             Long currentUserId = SessionManager.getInstance().getUserId();
 
             if (currentUserId != null && currentUserId.equals(ad.getOwnerId())) {
@@ -76,11 +76,11 @@ public class AdDetailsController {
         if (currentAdId == null) return;
 
         try {
-            // ارسال درخواست افزودن به بک‌اند (مرحله ۳ سناریو)
+            // ارسال درخواست افزودن به بک‌اند
             favoriteService.addToFavorites(currentAdId);
             showAlert(Alert.AlertType.INFORMATION, "موفق", "این آگهی به لیست علاقه‌مندی‌های شما اضافه شد.");
         } catch (Exception e) {
-            // نمایش خطاهای بک‌اند (مثلاً آگهی از قبل اضافه شده باشد - مرحله ۴ سناریو)
+            // نمایش خطاهای بک‌اند
             showAlert(Alert.AlertType.ERROR, "خطا در ثبت علاقه‌مندی", e.getMessage());
         }
     }
@@ -181,7 +181,7 @@ public class AdDetailsController {
     public void onRateSellerClick(ActionEvent event) {
         if (currentAdId == null) return;
 
-        // ۱. ساخت پنجره دیالوگ سفارشی برای امتیازدهی (مرحله ۲، ۳ و ۴ سناریو)
+        // ۱. ساخت پنجره دیالوگ سفارشی برای امتیازدهی
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("امتیازدهی به فروشنده");
         dialog.setHeaderText("ثبت امتیاز برای فروشنده آگهی: " + titleLabel.getText());
@@ -196,7 +196,7 @@ public class AdDetailsController {
 
         Label ratingInfoLabel = new Label("امتیاز شما از ۱ تا ۵ *:");
         ComboBox<Integer> ratingComboBox = new ComboBox<>();
-        ratingComboBox.getItems().addAll(5, 4, 3, 2, 1); // گزینه‌های معتبر امتیاز (مرحله ۳ سناریو)
+        ratingComboBox.getItems().addAll(5, 4, 3, 2, 1); // گزینه‌های معتبر امتیاز
         ratingComboBox.setValue(5); // پیش‌فرض ۵ ستاره
 
         Label commentLabel = new Label("نظر متنی شما (اختیاری):");
@@ -214,12 +214,12 @@ public class AdDetailsController {
                 String commentValue = commentTextArea.getText().trim();
 
                 try {
-                    // ارسال درخواست به سرور (مرحله ۵ سناریو)
+                    // ارسال درخواست به سرور
                     ratingService.rateSeller(currentAdId, ratingValue, commentValue);
 
                     showAlert(Alert.AlertType.INFORMATION, "موفق", "امتیاز شما با موفقیت ثبت شد. متشکریم!");
 
-                    // بروزرسانی پویای اطلاعات آگهی برای نمایش سریع میانگین امتیاز جدید (مرحله ۱۰ سناریو)
+                    // بروزرسانی پویای اطلاعات آگهی برای نمایش سریع میانگین امتیاز جدید
                     loadAdDetails();
 
                 } catch (Exception e) {

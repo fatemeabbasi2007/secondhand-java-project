@@ -31,7 +31,7 @@ public class NewAdController {
         priceField.setText(String.valueOf(price));
         cityField.setText(city);
         categoryField.setText(category);
-        descriptionField.setText(description); // اگر نام فیلد در پروژه شما descriptionArea است، آن را اصلاح کنید
+        descriptionField.setText(description);
     }
 
     @FXML
@@ -70,7 +70,7 @@ public class NewAdController {
         double pricee = Double.parseDouble(priceStr);
 
         try {
-            // بخش اصلی و هوشمند اینجاست:
+            // بخش اصلی :
             if (editingAdId != null) {
                 // اگر متغیر آی‌دی خالی نبود، یعنی در حال ویرایش هستیم:
                 adService.updateAdvertisement(editingAdId, title, description, pricee, city, category);

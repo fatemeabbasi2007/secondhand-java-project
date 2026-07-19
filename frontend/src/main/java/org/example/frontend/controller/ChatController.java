@@ -31,7 +31,7 @@ public class ChatController {
         conversationsListView.setItems(conversationsList);
         messagesListView.setItems(messagesList);
 
-        // ۱. شخصی‌سازی سلول گفت‌وگوها (نمایش عنوان آگهی، کاربر، آخرین پیام و زمان آن) (خواسته سناریو)
+        // ۱. شخصی‌سازی سلول گفت‌وگوها (نمایش عنوان آگهی، کاربر، آخرین پیام و زمان آن)
         conversationsListView.setCellFactory(param -> new ListCell<>() {
             @Override
             protected void updateItem(ConversationResponse item, boolean empty) {
@@ -51,7 +51,7 @@ public class ChatController {
             }
         });
 
-        // ۲. شخصی‌سازی سلول پیام‌ها (تشخیص فرستنده برای خوانایی بهتر در تاریخچه چت)
+        // ۲. شخصی‌سازی سلول پیام‌ها
         messagesListView.setCellFactory(param -> new ListCell<>() {
             @Override
             protected void updateItem(MessageResponse item, boolean empty) {
@@ -74,7 +74,7 @@ public class ChatController {
             }
         });
 
-        // شنونده انتخاب گفت‌وگو (مرحله ۴ سناریو)
+        // شنونده انتخاب گفت‌وگو
         conversationsListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 selectedConversation = newVal;
@@ -106,7 +106,7 @@ public class ChatController {
         }
     }
 
-    // ۳. ارسال پیام جدید (مراحل ۷ و ۸ سناریو)
+    // ۳. ارسال پیام جدید
     @FXML
     public void onSendMessageClick(ActionEvent event) {
         if (selectedConversation == null) {

@@ -31,14 +31,14 @@ public class RegisterController {
         String phone = phoneField.getText().trim();
         String email = emailField.getText().trim();
 
-        // اعتبارسنجی اولیه فرم (خالی نبودن فیلدهای ضروری) [cite: 927, 1131]
+        // اعتبارسنجی اولیه فرم (خالی نبودن فیلدهای ضروری)
         if (name.isEmpty() || username.isEmpty() || password.isEmpty() || phone.isEmpty()) {
             showAlert(Alert.AlertType.WARNING, "خطای اعتبارسنجی", "لطفاً تمام فیلدهای ضروری را پر کنید.");
             return;
         }
 
         try {
-            // ارسال به لایه سرویس [cite: 928, 1151]
+            // ارسال به لایه سرویس
             authService.register(name, username, password, phone, email);
 
             // نمایش پیام موفقیت دریافتی [cite: 933, 1191]
@@ -46,7 +46,7 @@ public class RegisterController {
             clearFields();
 
         } catch (Exception e) {
-            // نمایش دقیق پیام خطای صادر شده از سمت بک‌اند [cite: 934, 1191]
+            // نمایش دقیق پیام خطای صادر شده از سمت بک‌اند
             showAlert(Alert.AlertType.ERROR, "خطا در ثبت‌نام", e.getMessage());
         }
     }

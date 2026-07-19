@@ -26,7 +26,7 @@ public class PublicAdService {
         this.objectMapper = new ObjectMapper();
     }
 
-    // دریافت لیست آگهی‌های فعال با قابلیت جست‌وجو و فیلتر (مراحل ۲ و ۷ سناریو)
+    // دریافت لیست آگهی‌های فعال با قابلیت جست‌وجو و فیلتر
     public List<AdResponse> getActiveAdvertisements(String query, String category, String city, Double minPrice, Double maxPrice) throws Exception {
         // ساخت رشته پرس‌وجو (Query String) به صورت پویا
         StringBuilder urlBuilder = new StringBuilder(ApiConfig.BASE_URL + "/api/advertisements/active?");

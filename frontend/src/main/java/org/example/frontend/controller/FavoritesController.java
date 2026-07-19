@@ -48,7 +48,7 @@ public class FavoritesController {
         }
     }
 
-    // حذف آگهی نشانه‌گذاری شده (مرحله ۷ سناریو)
+    // حذف آگهی نشانه‌گذاری شده
     @FXML
     public void onRemoveFavoriteClick(ActionEvent event) {
         FavoriteResponse selected = favoritesListView.getSelectionModel().getSelectedItem();

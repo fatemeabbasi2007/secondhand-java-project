@@ -24,7 +24,7 @@ public class AdminService {
         this.objectMapper = new ObjectMapper();
     }
 
-    // ۱. دریافت لیست آگهی‌های در انتظار بررسی (مرحله ۲ سناریو)
+    // ۱. دریافت لیست آگهی‌های در انتظار بررسی
     public List<PendingAdResponse> getPendingAdvertisements() throws Exception {
         String token = SessionManager.getInstance().getToken();
         if (token == null) {
@@ -48,7 +48,7 @@ public class AdminService {
         }
     }
 
-    // ۲. تایید یا رد آگهی (مراحل ۴ تا ۷ سناریو)
+    // ۲. تایید یا رد آگهی
     public void reviewAdvertisement(Long adId, boolean approved, String rejectionReason) throws Exception {
         String token = SessionManager.getInstance().getToken();
         if (token == null) {
@@ -127,7 +127,7 @@ public class AdminService {
         }
     }
 
-    // متد حذف آگهی نامناسب (با استفاده از متد DELETE بر اساس مستندات پروژه)
+    // متد حذف آگهی نامناسب (با استفاده از متد DELETE )
     public void deleteInappropriateAdvertisement(Long adId) throws Exception {
         String token = SessionManager.getInstance().getToken();
         if (token == null) throw new Exception("شما به عنوان مدیر وارد سیستم نشده‌اید.");

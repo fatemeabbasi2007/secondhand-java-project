@@ -22,7 +22,7 @@ public class MainController {
 
     @FXML private ListView<AdResponse> adsListView;
 
-    // بخش نمایش جزئیات آگهی انتخاب شده در صفحه اصلی (مرحله ۸ سناریو)
+    // بخش نمایش جزئیات آگهی انتخاب شده در صفحه اصلی
     @FXML private Label titleLabel;
     @FXML private Label priceLabel;
     @FXML private Label cityLabel;
@@ -74,7 +74,7 @@ public class MainController {
         onSearchClick(null);
     }
 
-    // مدیریت کلیک دکمه جست‌وجو و اعمال فیلترها (مراحل ۴، ۵ و ۶ سناریو)
+    // مدیریت کلیک دکمه جست‌وجو و اعمال فیلترها
     @FXML
     public void onSearchClick(ActionEvent event) {
         String query = searchField.getText().trim();

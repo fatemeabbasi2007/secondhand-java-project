@@ -22,7 +22,7 @@ public class ChatService {
         this.objectMapper = new ObjectMapper();
     }
 
-    // ارسال درخواست شروع گفت‌وگو یا فرستادن اولین پیام (مراحل ۴ تا ۹ سناریو)
+    // ارسال درخواست شروع گفت‌وگو یا فرستادن اولین پیام
     public void startConversation(Long adId, String messageText) throws Exception {
         String token = SessionManager.getInstance().getToken();
         if (token == null) {
@@ -74,7 +74,7 @@ public class ChatService {
         }
     }
 
-    // ۲. دریافت پیام‌های یک گفت‌وگو به ترتیب زمان (مراحل ۵ و ۶ سناریو)
+    // ۲. دریافت پیام‌های یک گفت‌وگو به ترتیب زمان
     public List<MessageResponse> getMessages(Long conversationId) throws Exception {
         String token = SessionManager.getInstance().getToken();
         if (token == null) throw new Exception("کاربر وارد سیستم نشده است.");
@@ -95,7 +95,7 @@ public class ChatService {
         }
     }
 
-    // ۳. ارسال پیام جدید در گفت‌وگو (مراحل ۷ و ۸ سناریو)
+    // ۳. ارسال پیام جدید در گفت‌وگو
     public void sendMessage(Long conversationId, String content) throws Exception {
         String token = SessionManager.getInstance().getToken();
         if (token == null) throw new Exception("کاربر وارد سیستم نشده است.");

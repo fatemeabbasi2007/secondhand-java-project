@@ -21,7 +21,7 @@ public class RatingService {
         this.objectMapper = new ObjectMapper();
     }
 
-    // ارسال امتیاز به بک‌اند (مراحل ۵ تا ۹ سناریو)
+    // ارسال امتیاز به بک‌اند
     public void rateSeller(Long adId, int rating, String comment) throws Exception {
         String token = SessionManager.getInstance().getToken();
         if (token == null) {

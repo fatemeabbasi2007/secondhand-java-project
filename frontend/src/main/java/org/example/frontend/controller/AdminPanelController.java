@@ -60,7 +60,7 @@ public class AdminPanelController {
             if (newVal != null) showAdDetails(newVal);
         });
 
-        // تنظیم لیست کاربران (جدید)
+        // تنظیم لیست کاربران
         usersListView.setItems(usersList);
         usersListView.setCellFactory(param -> new ListCell<>() {
             @Override
@@ -166,7 +166,7 @@ public class AdminPanelController {
         }
     }
 
-    // قابلیت حذف مستقیم آگهی نامناسب (جدید)
+    // قابلیت حذف مستقیم آگهی نامناسب
     @FXML
     public void onDeleteAdClick(ActionEvent event) {
         if (selectedAd == null) {

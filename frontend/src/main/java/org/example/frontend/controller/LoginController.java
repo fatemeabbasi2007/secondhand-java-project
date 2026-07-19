@@ -24,17 +24,17 @@ public class LoginController {
         String username = usernameField.getText().trim();
         String password = passwordField.getText();
 
-        // اعتبارسنجی اولیه فرم در فرانت‌اند [cite: 1130, 1150]
+        // اعتبارسنجی اولیه فرم در فرانت‌اند
         if (username.isEmpty() || password.isEmpty()) {
             showAlert(Alert.AlertType.WARNING, "خطای ورودی", "لطفاً نام کاربری و رمز عبور را وارد کنید.");
             return;
         }
 
         try {
-            // ارسال درخواست به لایه سرویس و دریافت پاسخ موفق [cite: 200, 202]
+            // ارسال درخواست به لایه سرویس و دریافت پاسخ موفق
             LoginResponse response = authService.login(username, password);
 
-            // ذخیره توکن و مشخصات کاربر در SessionManager [cite: 249]
+            // ذخیره توکن و مشخصات کاربر در SessionManager
             SessionManager.getInstance().createSession(
                     response.getToken(),
                     response.getUserId(),
@@ -54,7 +54,7 @@ public class LoginController {
             }
 
         } catch (Exception e) {
-            // نمایش دقیق پیام خطایی که سرور فرستاده است (مثلاً رمز عبور اشتباه است) [cite: 1191, 1242]
+            // نمایش دقیق پیام خطایی که سرور فرستاده است (مثلاً رمز عبور اشتباه است)
             showAlert(Alert.AlertType.ERROR, "خطا در ورود", "ورود ناموفق: " + e.getMessage());
         }
     }
