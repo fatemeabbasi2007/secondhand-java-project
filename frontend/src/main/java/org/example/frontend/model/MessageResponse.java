@@ -1,29 +1,31 @@
 package org.example.frontend.model;
 
+import java.time.LocalDateTime;
+
 public class MessageResponse {
-    private Long id;
-    private String senderUsername;
+    //private Long id;
+    private String senderId;
     private String content;
-    private String timestamp;
+    private LocalDateTime sendAt;
 
     public MessageResponse() {}
 
-    public MessageResponse(Long id, String senderUsername, String content, String timestamp) {
-        this.id = id;
-        this.senderUsername = senderUsername;
+    public MessageResponse(String senderUsername, String content, LocalDateTime timestamp) {
+        //this.id = id;
+        this.senderId = senderUsername;
         this.content = content;
-        this.timestamp = timestamp;
+        this.sendAt = timestamp;
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    //public Long getId() { return id; }
+    //public void setId(Long id) { this.id = id; }
 
-    public String getSenderUsername() { return senderUsername; }
-    public void setSenderUsername(String senderUsername) { this.senderUsername = senderUsername; }
+    public String getSenderId() { return senderId; }
+    public void setSenderId(String senderId) { this.senderId = senderId; }
 
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
 
-    public String getTimestamp() { return timestamp; }
-    public void setTimestamp(String timestamp) { this.timestamp = timestamp; }
+    public LocalDateTime getSendAt() { return sendAt; }
+    public void setSendAt(LocalDateTime sendAt) { this.sendAt = sendAt; }
 }

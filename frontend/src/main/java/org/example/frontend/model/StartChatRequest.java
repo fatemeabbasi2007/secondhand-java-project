@@ -1,19 +1,19 @@
 package org.example.frontend.model;
 
 public class StartChatRequest {
-    private Long advertisementId;
-    private String firstMessage;
+    private Long senderId;
+    private String content;
 
     public StartChatRequest() {}
 
     public StartChatRequest(Long advertisementId, String firstMessage) {
-        this.advertisementId = advertisementId;
-        this.firstMessage = firstMessage;
+        this.senderId = advertisementId;
+        this.content = firstMessage;
     }
 
-    public Long getAdvertisementId() { return advertisementId; }
-    public void setAdvertisementId(Long advertisementId) { this.advertisementId = advertisementId; }
+    public Long getSenderId() { return senderId; }
+    public void setSenderId(Long senderId) { this.senderId = senderId; }
 
-    public String getFirstMessage() { return firstMessage; }
-    public void setFirstMessage(String firstMessage) { this.firstMessage = firstMessage; }
+    public String getContent() { return content; }
+    public void setContent(String content) { this.content = content; }
 }

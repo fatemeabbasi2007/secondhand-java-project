@@ -32,8 +32,8 @@ public class AdminService {
         }
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(ApiConfig.BASE_URL + "/api/admin/advertisements/pending"))
-                .header("Authorization", "Bearer " + token)
+                .uri(URI.create(ApiConfig.BASE_URL + "/api/advertisements/admin/pending"))
+                //.header("Authorization", "Bearer " + token)
                 .GET()
                 .build();
 
@@ -138,9 +138,8 @@ public class AdminService {
         if (token == null) throw new Exception("شما به عنوان مدیر وارد سیستم نشده‌اید.");
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(ApiConfig.BASE_URL + "/api/admin/advertisements/" + adId))
-                .header("Authorization", "Bearer " + token)
-                .DELETE() // استفاده از متد DELETE برای حذف آگهی نامناسب
+                .uri(URI.create(ApiConfig.BASE_URL + "/api/advertisements/admin/" + adId))
+                .DELETE()
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());

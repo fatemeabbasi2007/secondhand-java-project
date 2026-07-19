@@ -1,5 +1,7 @@
 package org.example.frontend.model;
 
+import java.util.List;
+
 public class AdResponse {
     private Long id;
     private String title;
@@ -8,6 +10,7 @@ public class AdResponse {
     private String city;
     private String category;
     private String ownerUsername;
+    private List<String> imageUrlsList;
 
     public AdResponse() {}
 
@@ -19,6 +22,7 @@ public class AdResponse {
         this.city = city;
         this.category = category;
         this.ownerUsername = ownerUsername;
+
     }
 
     // متدهای Getter و Setter
@@ -42,4 +46,7 @@ public class AdResponse {
 
     public String getOwnerUsername() { return ownerUsername; }
     public void setOwnerUsername(String ownerUsername) { this.ownerUsername = ownerUsername; }
+
+    public List<String> getImageUrlsList() {return imageUrlsList;}
+    public void setImageUrlsList(List<String> imageUrlsList) {this.imageUrlsList = imageUrlsList;}
 }
