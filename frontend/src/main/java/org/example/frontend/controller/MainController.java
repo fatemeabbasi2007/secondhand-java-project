@@ -2,6 +2,7 @@ package org.example.frontend.controller;
 
 import org.example.frontend.model.AdResponse;
 import org.example.frontend.security.SessionManager;
+import org.example.frontend.service.AuthService;
 import org.example.frontend.service.PublicAdService;
 import org.example.frontend.util.NavigationService;
 import javafx.fxml.FXML;
@@ -138,14 +139,14 @@ public class MainController {
         NavigationService.navigate(event, "new-advertisement.fxml", "ثبت آگهی جدید");
     }
 
-    @FXML
-    public void onLogoutClick(ActionEvent event) {
-        System.out.println("خروج از حساب...");
-        // پاک کردن اطلاعات نشست کاربر
-        SessionManager.getInstance().cleanSession();
-        // هدایت به صفحه لاگین
-        NavigationService.navigate(event, "login.fxml", "ورود به سامانه");
-    }
+//    @FXML
+//    public void onLogoutClick(ActionEvent event) {
+//        System.out.println("خروج از حساب...");
+//        // پاک کردن اطلاعات نشست کاربر
+//        SessionManager.getInstance().cleanSession();
+//        // هدایت به صفحه لاگین
+//        NavigationService.navigate(event, "login.fxml", "ورود به سامانه");
+//    }
 
     @FXML
     public void onGoToChatsClick(ActionEvent event) {
@@ -155,6 +156,29 @@ public class MainController {
     @FXML
     public void onGoToFavoritesClick(ActionEvent event) {
         NavigationService.navigate(event, "favorites-view.fxml", "علاقه‌مندی‌های من");
+    }
+
+
+    private final AuthService authService = new AuthService();
+    @FXML
+    public void onLogoutClick(ActionEvent event) {
+        try {
+            // ۱. اول به سرور می‌گوییم که سشن را باطل کند
+            authService.logout();
+
+            // ۲. حالا اطلاعات محلی برنامه را پاک می‌کنیم
+            SessionManager.getInstance().cleanSession();
+
+            System.out.println("خروج موفقیت‌آمیز بود.");
+
+            // ۳. هدایت کاربر به صفحه لاگین
+            NavigationService.navigate(event, "login.fxml", "صفحه ورود به سامانه");
+
+        } catch (Exception e) {
+            // حتی اگر سرور خطا داد، برای اطمینان سشن فرانت‌اندمان را پاک می‌کنیم و خارج می‌شویم
+            SessionManager.getInstance().cleanSession();
+            NavigationService.navigate(event, "login.fxml", "صفحه ورود به سامانه");
+        }
     }
 
     private void clearDetails() {

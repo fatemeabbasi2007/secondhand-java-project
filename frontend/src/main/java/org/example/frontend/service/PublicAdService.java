@@ -28,15 +28,17 @@ public class PublicAdService {
 
     // دریافت لیست آگهی‌های فعال با قابلیت جست‌وجو و فیلتر
     public List<AdResponse> getActiveAdvertisements(String query, String category, String city, Double minPrice, Double maxPrice) throws Exception {
-        // ساخت رشته پرس‌وجو (Query String) به صورت پویا
-        StringBuilder urlBuilder = new StringBuilder(ApiConfig.BASE_URL + "/api/advertisements/active?");
+
+        StringBuilder urlBuilder = new StringBuilder(ApiConfig.BASE_URL + "/api/advertisements/search?");
 
         if (query != null && !query.isBlank()) {
-            urlBuilder.append("query=").append(URLEncoder.encode(query, StandardCharsets.UTF_8)).append("&");
+            urlBuilder.append("keyword=").append(URLEncoder.encode(query, StandardCharsets.UTF_8)).append("&");
         }
+
         if (category != null && !category.isBlank()) {
-            urlBuilder.append("category=").append(URLEncoder.encode(category, StandardCharsets.UTF_8)).append("&");
+            urlBuilder.append("categoryId=").append(URLEncoder.encode(category, StandardCharsets.UTF_8)).append("&");
         }
+
         if (city != null && !city.isBlank()) {
             urlBuilder.append("city=").append(URLEncoder.encode(city, StandardCharsets.UTF_8)).append("&");
         }
@@ -47,8 +49,14 @@ public class PublicAdService {
             urlBuilder.append("maxPrice=").append(maxPrice).append("&");
         }
 
+        // حذف آخرین کاراکتر '&' یا '?' در صورت وجود
+        String finalUrl = urlBuilder.toString();
+        if (finalUrl.endsWith("&") || finalUrl.endsWith("?")) {
+            finalUrl = finalUrl.substring(0, finalUrl.length() - 1);
+        }
+
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(urlBuilder.toString()))
+                .uri(URI.create(finalUrl))
                 .GET()
                 .build();
 
@@ -61,7 +69,7 @@ public class PublicAdService {
                 ErrorResponse error = objectMapper.readValue(response.body(), ErrorResponse.class);
                 throw new Exception(error.getMessage());
             } catch (Exception e) {
-                throw new Exception("خطا در دریافت لیست آگهی‌ها. کد وضعیت: " + response.statusCode());
+                throw new Exception("خطا در دریافت لیست آگهی‌ها، کد وضعیت: " + response.statusCode());
             }
         }
     }
@@ -93,8 +101,8 @@ public class PublicAdService {
         if (token == null) throw new Exception("جهت انجام عملیات ابتدا وارد حساب خود شوید.");
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(ApiConfig.BASE_URL + "/api/advertisements/" + adId))
-                .header("Authorization", "Bearer " + token)
+                .uri(URI.create(ApiConfig.BASE_URL + "/api/advertisements/own/" + adId))
+                //.header("Authorization", "Bearer " + token)
                 .DELETE()
                 .build();
 
@@ -107,6 +115,21 @@ public class PublicAdService {
             } catch (Exception e) {
                 throw new Exception("خطا در حذف آگهی. کد وضعیت: " + response.statusCode());
             }
+        }
+    }
+
+    public void markAsSold(Long adId) throws Exception {
+        java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                .uri(java.net.URI.create(ApiConfig.BASE_URL + "/api/advertisements/own/" + adId + "/sold"))
+                .method("PATCH", java.net.http.HttpRequest.BodyPublishers.noBody())
+                .build();
+
+        java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            // مدیریت و خواندن خطای بک‌آند
+            ErrorResponse error = objectMapper.readValue(response.body(), ErrorResponse.class);
+            throw new Exception(error.getMessage());
         }
     }
 }

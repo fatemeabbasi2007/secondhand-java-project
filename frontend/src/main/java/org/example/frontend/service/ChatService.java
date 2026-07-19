@@ -7,9 +7,11 @@ import org.example.frontend.model.*;
 import org.example.frontend.security.SessionManager;
 
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class ChatService {
@@ -32,10 +34,13 @@ public class ChatService {
         StartChatRequest chatRequest = new StartChatRequest(adId, messageText);
         String jsonBody = objectMapper.writeValueAsString(chatRequest);
 
+        // آدرس متد به همراه RequestParam
+        String url = ApiConfig.BASE_URL + "/api/chats/send?advertisementId=" +
+                URLEncoder.encode(adId.toString(), StandardCharsets.UTF_8);
+
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(ApiConfig.BASE_URL + "/api/conversations/start"))
+                .uri(URI.create(url))
                 .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + token)
                 .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                 .build();
 
@@ -59,8 +64,8 @@ public class ChatService {
         if (token == null) throw new Exception("کاربر وارد سیستم نشده است.");
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(ApiConfig.BASE_URL + "/api/conversations"))
-                .header("Authorization", "Bearer " + token)
+                .uri(URI.create(ApiConfig.BASE_URL + "/api/chats/conversations"))
+                //.header("Authorization", "Bearer " + token)
                 .GET()
                 .build();
 
@@ -80,8 +85,7 @@ public class ChatService {
         if (token == null) throw new Exception("کاربر وارد سیستم نشده است.");
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(ApiConfig.BASE_URL + "/api/conversations/" + conversationId + "/messages"))
-                .header("Authorization", "Bearer " + token)
+                .uri(URI.create(ApiConfig.BASE_URL + "/api/chats/conversations/" + conversationId + "/messages"))
                 .GET()
                 .build();
 
@@ -96,17 +100,19 @@ public class ChatService {
     }
 
     // ۳. ارسال پیام جدید در گفت‌وگو
-    public void sendMessage(Long conversationId, String content) throws Exception {
+    public void sendMessage(String adId, String content) throws Exception {
         String token = SessionManager.getInstance().getToken();
         if (token == null) throw new Exception("کاربر وارد سیستم نشده است.");
 
         SendMessageRequest sendRequest = new SendMessageRequest(content);
         String jsonBody = objectMapper.writeValueAsString(sendRequest);
 
+        String url = ApiConfig.BASE_URL + "/api/chats/send?advertisementId=" +
+                URLEncoder.encode(adId, StandardCharsets.UTF_8);
+
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(ApiConfig.BASE_URL + "/api/conversations/" + conversationId + "/messages"))
+                .uri(URI.create(url))
                 .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + token)
                 .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                 .build();
 

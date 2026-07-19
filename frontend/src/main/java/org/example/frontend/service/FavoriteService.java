@@ -25,12 +25,12 @@ public class FavoriteService {
 
     //  افزودن آگهی به علاقه‌مندی‌ها
     public void addToFavorites(Long adId) throws Exception {
-        String token = SessionManager.getInstance().getToken();
-        if (token == null) throw new Exception("لطفاً ابتدا وارد حساب کاربری خود شوید.");
+        Long userId = SessionManager.getInstance().getUserId();
+        if (userId == null) throw new Exception("لطفاً ابتدا وارد حساب کاربری خود شوید.");
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(ApiConfig.BASE_URL + "/api/favorites/add/" + adId))
-                .header("Authorization", "Bearer " + token)
+                .uri(URI.create(ApiConfig.BASE_URL + "/api/users/" + userId.toString() + "/favorites/" + adId))
+                //.header("Authorization", "Bearer " + token)
                 .POST(HttpRequest.BodyPublishers.noBody())
                 .build();
 
@@ -43,12 +43,12 @@ public class FavoriteService {
 
     //  دریافت لیست علاقه‌مندی‌های کاربر
     public List<FavoriteResponse> getFavorites() throws Exception {
-        String token = SessionManager.getInstance().getToken();
-        if (token == null) throw new Exception("لطفاً ابتدا وارد حساب کاربری خود شوید.");
+        Long userId = SessionManager.getInstance().getUserId();
+        if (userId == null) throw new Exception("لطفاً ابتدا وارد حساب کاربری خود شوید.");
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(ApiConfig.BASE_URL + "/api/favorites"))
-                .header("Authorization", "Bearer " + token)
+                .uri(URI.create(ApiConfig.BASE_URL + "/api/users/" + userId + "/favorites"))
+                //.header("Authorization", "Bearer " + token)
                 .GET()
                 .build();
 
@@ -64,12 +64,12 @@ public class FavoriteService {
 
     //  حذف آگهی از لیست علاقه‌مندی‌ها
     public void removeFromFavorites(Long favoriteId) throws Exception {
-        String token = SessionManager.getInstance().getToken();
-        if (token == null) throw new Exception("لطفاً ابتدا وارد حساب کاربری خود شوید.");
+        Long userId = SessionManager.getInstance().getUserId();
+        if (userId == null) throw new Exception("لطفاً ابتدا وارد حساب کاربری خود شوید.");
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(ApiConfig.BASE_URL + "/api/favorites/" + favoriteId))
-                .header("Authorization", "Bearer " + token)
+                .uri(URI.create(ApiConfig.BASE_URL + "/api/users/" + userId.toString() + "/favorites/" + favoriteId))
+                //.header("Authorization", "Bearer " + token)
                 .DELETE()
                 .build();
 

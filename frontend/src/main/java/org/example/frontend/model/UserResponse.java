@@ -4,10 +4,10 @@ public class UserResponse {
     private Long id;
     private String fullName;
     private String username;
-    private String phoneNumber;
+    private String phoneNum;
     private String email;
     private String role;
-    private boolean blocked; // وضعیت مسدود بودن کاربر
+    private boolean enable; // وضعیت مسدود بودن کاربر
 
     public UserResponse() {}
 
@@ -15,10 +15,10 @@ public class UserResponse {
         this.id = id;
         this.fullName = fullName;
         this.username = username;
-        this.phoneNumber = phoneNumber;
+        this.phoneNum = phoneNumber;
         this.email = email;
         this.role = role;
-        this.blocked = blocked;
+        this.enable = blocked;
     }
 
     // متدهای Getter و Setter
@@ -31,8 +31,8 @@ public class UserResponse {
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
 
-    public String getPhoneNumber() { return phoneNumber; }
-    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+    public String getPhoneNumber() { return phoneNum; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNum = phoneNumber; }
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
@@ -40,6 +40,6 @@ public class UserResponse {
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
 
-    public boolean isBlocked() { return blocked; }
-    public void setBlocked(boolean blocked) { this.blocked = blocked; }
+    public boolean isBlocked() { return enable; }
+    public void setBlocked(boolean blocked) { this.enable = blocked; }
 }

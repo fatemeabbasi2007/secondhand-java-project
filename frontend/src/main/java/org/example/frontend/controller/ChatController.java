@@ -39,7 +39,7 @@ public class ChatController {
                 if (empty || item == null) {
                     setText(null);
                 } else {
-                    String lastMsg = item.getLastMessage() != null ? item.getLastMessage() : "پیامی ارسال نشده";
+                    String lastMsg = item.getLastMessagePreview() != null ? item.getLastMessagePreview() : "پیامی ارسال نشده";
                     if (lastMsg.length() > 25) lastMsg = lastMsg.substring(0, 22) + "...";
 
                     setText(String.format("آگهی: %s\nطرف مقابل: %s\nآخرین پیام: %s (%s)",
@@ -61,13 +61,13 @@ public class ChatController {
                     setStyle("");
                 } else {
                     String currentUsername = SessionManager.getInstance().getUsername();
-                    if (item.getSenderUsername().equalsIgnoreCase(currentUsername)) {
+                    if (item.getSenderId().equalsIgnoreCase(currentUsername)) {
                         // پیام خود کاربر (چینش یا رنگ متفاوت)
-                        setText("[شما]: " + item.getContent() + " \n(" + item.getTimestamp() + ")");
+                        setText("[شما]: " + item.getContent() + " \n(" + item.getSendAt() + ")");
                         setStyle("-fx-text-fill: #1565C0; -fx-padding: 5;");
                     } else {
                         // پیام طرف مقابل
-                        setText("[" + item.getSenderUsername() + "]: " + item.getContent() + " \n(" + item.getTimestamp() + ")");
+                        setText("[" + item.getSenderId() + "]: " + item.getContent() + " \n(" + item.getSendAt() + ")");
                         setStyle("-fx-text-fill: #37474F; -fx-padding: 5;");
                     }
                 }
@@ -122,8 +122,9 @@ public class ChatController {
         messageInputArea.setStyle("");
 
         try {
+            String adId = selectedConversation.getAdvertisementId().toString();
             // ارسال پیام به بک‌اند و ذخیره سازی
-            chatService.sendMessage(selectedConversation.getConversationId(), content);
+            chatService.sendMessage(adId, content);
             messageInputArea.clear();
 
             // به‌روزرسانی پویای پیام‌های چت انتخابی برای نمایش فوری پیام ارسال شده به کاربر

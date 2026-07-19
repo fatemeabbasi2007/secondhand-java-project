@@ -1,5 +1,7 @@
 package org.example.frontend.model;
 
+import java.util.List;
+
 public class PendingAdResponse {
     private Long id;
     private String title;
@@ -8,6 +10,7 @@ public class PendingAdResponse {
     private String city;
     private String category;
     private String ownerUsername;
+    private List<String> imageUrlsList;
 
     public PendingAdResponse() {}
 
@@ -42,4 +45,7 @@ public class PendingAdResponse {
 
     public String getOwnerUsername() { return ownerUsername; }
     public void setOwnerUsername(String ownerUsername) { this.ownerUsername = ownerUsername; }
+
+    public List<String> getImageUrlsList() {return imageUrlsList;}
+    public void setImageUrlsList(List<String> imageUrlsList) {this.imageUrlsList = imageUrlsList;}
 }
