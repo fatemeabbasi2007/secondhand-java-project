@@ -2,6 +2,7 @@ package org.example.backend.controller;
 
 import jakarta.servlet.http.HttpSession;
 import org.example.backend.exeption.*;
+import org.example.backend.model.Advertisement;
 import org.example.backend.model.User;
 import org.example.backend.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -86,9 +87,9 @@ public class UserController {
     @GetMapping("/{userId}/favorites")
     public ResponseEntity<?> getFavorites(@PathVariable String userId) {
         try {
-            List<String> list = userService.getUserFavoriteAdIds(userId);
+            List<Advertisement> list = userService.getUserFavoriteAdIds(userId);
             return ResponseEntity.ok(list);
-        } catch (UserNotFoundException e) {
+        } catch (UserNotFoundException | AdvertisementNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
         }
     }

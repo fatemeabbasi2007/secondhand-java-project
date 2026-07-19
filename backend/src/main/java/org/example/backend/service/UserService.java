@@ -7,10 +7,7 @@ import org.example.backend.repository.AdvertisementRepository;
 import org.example.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -109,11 +106,16 @@ public class UserService {
         return true;
     }
 
-    public List<String> getUserFavoriteAdIds(String userId) {
+    public List<Advertisement> getUserFavoriteAdIds(String userId) {
         User myUser = userRepository.findByID(userId)
                 .orElseThrow(() -> new UserNotFoundException("کاربر مورد نظر یافت نشد."));
+        List<Advertisement> ads = new ArrayList<>();
 
-        return myUser.getFavoriteAdIds();
+        List<String > favAdsIds = myUser.getFavoriteAdIds();
+        for (String adId : favAdsIds){
+            advertisementRepository.findByID(adId).ifPresent(ads::add);
+        }
+        return ads;
     }
 
 
