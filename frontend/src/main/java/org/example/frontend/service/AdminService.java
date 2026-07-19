@@ -48,28 +48,33 @@ public class AdminService {
         }
     }
 
-    // ۲. تایید یا رد آگهی
-    public void reviewAdvertisement(Long adId, boolean approved, String rejectionReason) throws Exception {
-        String token = SessionManager.getInstance().getToken();
-        if (token == null) {
-            throw new Exception("شما به عنوان مدیر وارد سیستم نشده‌اید.");
-        }
-
-        AdminReviewRequest reviewRequest = new AdminReviewRequest(approved, rejectionReason);
-        String jsonBody = objectMapper.writeValueAsString(reviewRequest);
-
-        // بر اساس طراحی بک‌اند، مسیر تایید معمولاً به شکل زیر است:
-        // PUT /api/admin/advertisements/{id}/review
+    // ۱. متد تایید آگهی
+    public void approveAdvertisement(String adId) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(ApiConfig.BASE_URL + "/api/admin/advertisements/" + adId + "/review"))
-                .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + token)
-                .PUT(HttpRequest.BodyPublishers.ofString(jsonBody))
+                .uri(URI.create(ApiConfig.BASE_URL + "/api/advertisements/admin/" + adId + "/approve"))
+                .POST(HttpRequest.BodyPublishers.noBody())
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        if (response.statusCode() != 200 && response.statusCode() != 204) {
+        if (response.statusCode() != 200) {
+            handleErrorResponse(response);
+        }
+    }
+
+    // ۲. متد رد آگهی
+    public void rejectAdvertisement(String adId, String reason) throws Exception {
+        // تبدیل دلیل رد به فرمت مناسب URL (برای فضاها و کاراکترهای خاص)
+        String encodedReason = java.net.URLEncoder.encode(reason, java.nio.charset.StandardCharsets.UTF_8);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(ApiConfig.BASE_URL + "/api/advertisements/admin/" + adId + "/reject?reason=" + encodedReason))
+                .POST(HttpRequest.BodyPublishers.noBody()) // پارامترها در URL فرستاده می‌شوند
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
             handleErrorResponse(response);
         }
     }
@@ -92,8 +97,8 @@ public class AdminService {
         if (token == null) throw new Exception("شما به عنوان مدیر وارد سیستم نشده‌اید.");
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(ApiConfig.BASE_URL + "/api/admin/users"))
-                .header("Authorization", "Bearer " + token)
+                .uri(URI.create(ApiConfig.BASE_URL + "/api/users/admin/all-users"))
+                //.header("Authorization", "Bearer " + token)
                 .GET()
                 .build();
 
@@ -109,20 +114,20 @@ public class AdminService {
 
     // متد تغییر وضعیت مسدود بودن کاربر (مسدود یا رفع مسدود کردن)
     public void toggleUserBlockStatus(Long userId, boolean block) throws Exception {
-        String token = SessionManager.getInstance().getToken();
-        if (token == null) throw new Exception("شما به عنوان مدیر وارد سیستم نشده‌اید.");
+        // ۱. بر اساس وضعیت boolean، مسیر درست را مشخص می‌کنیم (آی‌دی کاربر به انتهای آدرس می‌رود)
+        String action = block ? "/block/" : "/unblock/";
+        String fullPath = "/api/users/admin" + action + userId;
 
-        // بر اساس متدهای استاندارد HTTP، ویرایش وضعیت کاربر معمولاً با PUT است
-        String endpoint = block ? "/block" : "/unblock";
+        // ۲. ساخت درخواست PATCH بدون بادی و توکن
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(ApiConfig.BASE_URL + "/api/admin/users/" + userId + endpoint))
-                .header("Authorization", "Bearer " + token)
-                .PUT(HttpRequest.BodyPublishers.noBody())
+                .uri(URI.create(ApiConfig.BASE_URL + fullPath))
+                .method("PATCH", HttpRequest.BodyPublishers.noBody())
                 .build();
 
+        // ۳. ارسال درخواست
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        if (response.statusCode() != 200 && response.statusCode() != 204) {
+        if (response.statusCode() != 200) {
             handleErrorResponse(response);
         }
     }
