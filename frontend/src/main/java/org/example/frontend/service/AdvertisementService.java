@@ -32,7 +32,7 @@ public class AdvertisementService {
 
         // ساخت درخواست همراه با هدر Authorization و توکن JWT
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(ApiConfig.BASE_URL + "/api/advertisements"))
+                .uri(URI.create(ApiConfig.BASE_URL + "/api/advertisements/create"))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + token) // ارسال توکن در درخواست
                 .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
@@ -68,7 +68,7 @@ public class AdvertisementService {
 
         // ارسال درخواست PUT به همراه آی‌دی آگهی در آدرس URL
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(ApiConfig.BASE_URL + "/api/advertisements/" + adId))
+                .uri(URI.create(ApiConfig.BASE_URL + "/api/advertisements/own/" + adId))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + token)
                 .PUT(HttpRequest.BodyPublishers.ofString(jsonBody)) // استفاده از PUT برای ویرایش

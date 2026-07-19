@@ -93,7 +93,7 @@ public class PublicAdService {
         if (token == null) throw new Exception("جهت انجام عملیات ابتدا وارد حساب خود شوید.");
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(ApiConfig.BASE_URL + "/api/advertisements/" + adId))
+                .uri(URI.create(ApiConfig.BASE_URL + "/api/advertisements/own/" + adId))
                 .header("Authorization", "Bearer " + token)
                 .DELETE()
                 .build();
@@ -107,6 +107,21 @@ public class PublicAdService {
             } catch (Exception e) {
                 throw new Exception("خطا در حذف آگهی. کد وضعیت: " + response.statusCode());
             }
+        }
+    }
+
+    public void markAsSold(Long adId) throws Exception {
+        java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                .uri(java.net.URI.create(ApiConfig.BASE_URL + "/api/advertisements/own/" + adId + "/sold"))
+                .method("PATCH", java.net.http.HttpRequest.BodyPublishers.noBody())
+                .build();
+
+        java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            // مدیریت و خواندن خطای بک‌آند
+            ErrorResponse error = objectMapper.readValue(response.body(), ErrorResponse.class);
+            throw new Exception(error.getMessage());
         }
     }
 }
