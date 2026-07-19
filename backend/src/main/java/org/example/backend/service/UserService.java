@@ -29,6 +29,10 @@ public class UserService {
         if ( pass == null || pass.length() < 8 ){
             throw new PassNotValidException("رمز عبور باید حداقل ۸ کاراکتر باشد.");
         }
+        String fullName = newUser.getFullName();
+        if (fullName == null || fullName.trim().isEmpty()) {
+            throw new IllegalArgumentException("وارد کردن نام و نام خانوادگی اجباری است.");
+        }
         String phoneNum = newUser.getPhoneNum();
         if ( phoneNum == null || phoneNum.length() != 11 || !phoneNum.startsWith("09")){
             throw new InvalidPhoneNumException("شماره تلفن وارد شده معتبر نیست (باید ۱۱ رقم و با ۰۹ آغاز شود).");        }
