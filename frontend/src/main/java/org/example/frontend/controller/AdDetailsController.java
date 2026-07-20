@@ -57,7 +57,7 @@ public class AdDetailsController {
             // مقایسه مالکیت آگهی با کاربر فعلی
             String currentUserId = SessionManager.getInstance().getUserId();
 
-            if (currentUserId != null && currentUserId.equals(ad.getOwnerId())) {
+            if (currentUserId != null && currentUserId.equals(ad.getOwnerId().toString())) {
                 // آگهی متعلق به خود کاربر است
                 ownerActionsBox.setVisible(true);
                 buyerActionsBox.setVisible(false);

@@ -1,11 +1,8 @@
 package org.example.frontend.controller;
 
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import org.example.frontend.service.AdvertisementService;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.event.ActionEvent;
 import org.example.frontend.util.NavigationService;
 
@@ -16,13 +13,18 @@ public class NewAdController {
     @FXML private TextArea descriptionField;
     @FXML private TextField priceField;
     @FXML private TextField cityField;
-    @FXML private TextField categoryField;
+    @FXML private ComboBox<String> categoryComboBox;
     @FXML private TextField imageUrlsField;
 
     private final AdvertisementService adService = new AdvertisementService();
 
     // تعریف متغیر در بالای کلاس NewAdController برای نگهداری آی‌دی آگهی در حالت ویرایش
     private String editingAdId = null;
+
+    @FXML
+    public void initialize() {
+        categoryComboBox.getItems().addAll("وسایل نقلیه", "خودرو", "موتور سیکلت", "املاک", "آپارتمان و مسکونی", "اداری و تجاری", "لوازم الکتریکی", "موبایل و تبلت", "لپ تاپ و کامپیوتر", "وسایل خانه و آشپزخانه", "مبلمان و لوازم چوبی", "وسایل شخصی", "پوشاک و کیف و کفش");
+    }
 
     // این متد برای پر کردن فیلدها در حالت ویرایش از طرف صفحه قبل صدا زده می‌شود
     public void setAdDataForEdit(String adId, String title, double price, String city, String category, String description, String text) {
@@ -31,7 +33,7 @@ public class NewAdController {
         titleField.setText(title);
         priceField.setText(String.valueOf(price));
         cityField.setText(city);
-        categoryField.setText(category);
+        categoryComboBox.setValue(category);
         descriptionField.setText(description);
         imageUrlsField.setText(text);
     }
@@ -44,7 +46,7 @@ public class NewAdController {
         String description = descriptionField.getText().trim();
         String priceStr = priceField.getText().trim();
         String city = cityField.getText().trim();
-        String category = categoryField.getText().trim();
+        String category = categoryComboBox.getValue() != null ? categoryComboBox.getValue().trim() : "";
         String urlsText = imageUrlsField.getText().trim();
 
         boolean hasError = false;
@@ -53,7 +55,7 @@ public class NewAdController {
         if (title.isEmpty()) { titleField.setStyle("-fx-border-color: red; -fx-border-width: 1.5px;"); hasError = true; }
         if (description.isEmpty()) { descriptionField.setStyle("-fx-border-color: red; -fx-border-width: 1.5px;"); hasError = true; }
         if (city.isEmpty()) { cityField.setStyle("-fx-border-color: red; -fx-border-width: 1.5px;"); hasError = true; }
-        if (category.isEmpty()) { categoryField.setStyle("-fx-border-color: red; -fx-border-width: 1.5px;"); hasError = true; }
+        if (category.isEmpty()) { categoryComboBox.setStyle("-fx-border-color: red; -fx-border-width: 1.5px;"); hasError = true; }
         if (urlsText.isEmpty()) { imageUrlsField.setStyle("-fx-border-color: red; -fx-border-width: 1.5px;"); hasError = true; }
 
         double price = 0;
@@ -123,7 +125,7 @@ public class NewAdController {
         descriptionField.setStyle("");
         priceField.setStyle("");
         cityField.setStyle("");
-        categoryField.setStyle("");
+        categoryComboBox.setStyle("");
     }
 
     private void clearFields() {
@@ -131,7 +133,7 @@ public class NewAdController {
         descriptionField.clear();
         priceField.clear();
         cityField.clear();
-        categoryField.clear();
+        categoryComboBox.setValue(null);
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {
