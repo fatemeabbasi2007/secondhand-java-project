@@ -1,5 +1,7 @@
 package org.example.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +16,13 @@ public class User {
     private String username;
     private String password;
     private String email;
+
+    @JsonProperty("phoneNum")
+    @JsonAlias({"phone", "phoneNumber", "phone_num", "mobile"})
     private String phoneNum;
+
+    @JsonProperty("fullName")
+    @JsonAlias({"name", "fullName", "full_name"})
     private String fullName;
 
     //  "USER" or "ADMIN"

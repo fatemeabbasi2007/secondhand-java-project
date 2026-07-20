@@ -21,7 +21,7 @@ public class UserService {
     }
 
     public boolean registerUser(User newUser) {
-
+        System.out.println("---> Phone received in backend: " + newUser.getPhoneNum());
         String pass = newUser.getPassword();
         if ( pass == null || pass.length() < 8 ){
             throw new PassNotValidException("رمز عبور باید حداقل ۸ کاراکتر باشد.");
