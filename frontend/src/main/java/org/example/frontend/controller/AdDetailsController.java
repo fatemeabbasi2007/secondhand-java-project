@@ -26,7 +26,7 @@ public class AdDetailsController {
     @FXML private HBox ownerActionsBox;
 
     private final PublicAdService adService = new PublicAdService();
-    private Long currentAdId;
+    private String currentAdId;
     // اضافه کردن فیلد سرویس چت به فیلدهای کلاس کنترلر
     private final org.example.frontend.service.ChatService chatService = new org.example.frontend.service.ChatService();
     // اضافه کردن فیلد سرویس امتیازدهی به فیلدهای کلاس کنترلر
@@ -35,7 +35,7 @@ public class AdDetailsController {
     private final org.example.frontend.service.FavoriteService favoriteService = new org.example.frontend.service.FavoriteService();
 
     // متدی برای مقداردهی اولیه آگهی از خارج از کنترلر (مثلاً از صفحه اصلی)
-    public void setAdId(Long adId) {
+    public void setAdId(String adId) {
         this.currentAdId = adId;
         loadAdDetails();
     }
@@ -55,7 +55,7 @@ public class AdDetailsController {
             imageLabel.setText(ad.getImageUrlsList().stream().collect(Collectors.joining(" ,")));
 
             // مقایسه مالکیت آگهی با کاربر فعلی
-            Long currentUserId = SessionManager.getInstance().getUserId();
+            String currentUserId = SessionManager.getInstance().getUserId();
 
             if (currentUserId != null && currentUserId.equals(ad.getOwnerId())) {
                 // آگهی متعلق به خود کاربر است

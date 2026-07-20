@@ -29,7 +29,8 @@ public class AdvertisementService {
     }
 
     public Advertisement createNewAdvertisement(Advertisement ad, List<String> imageUrls, String userID) {
-
+        System.out.println("--> Received categoryId from frontend: '" + ad.getCategoryId() + "'");
+        System.out.println("--> Categories available in backend cache: " + categoryRepository.findAll().stream().map(Category::getId).toList());
         User user = userRepository.findByID(userID).orElseThrow(() -> new UserNotFoundException("کاربر وجود ندارد"));
         if ( !user.isEnabled()){
             throw new UserBannedException("کاربر مسدود است");

@@ -3,7 +3,7 @@ package org.example.frontend.model;
 import java.util.List;
 
 public class AdResponse {
-    private Long id;
+    private String id;
     private String title;
     private String description;
     private double price;
@@ -14,7 +14,7 @@ public class AdResponse {
 
     public AdResponse() {}
 
-    public AdResponse(Long id, String title, String description, double price, String city, String category, String ownerUsername) {
+    public AdResponse(String id, String title, String description, double price, String city, String category, String ownerUsername) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -26,8 +26,8 @@ public class AdResponse {
     }
 
     // متدهای Getter و Setter
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }

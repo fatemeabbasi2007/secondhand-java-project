@@ -115,7 +115,7 @@ public class MainController {
     }
 
     // قرار دادن این منطق در زمان کلیک بر روی لیست آگهی‌ها در MainController
-    private void openAdDetailsPage(ActionEvent event, Long adId) {
+    private void openAdDetailsPage(ActionEvent event, String adId) {
         try {
             javafx.stage.Stage stage = (javafx.stage.Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/org/example/frontend/ad-details.fxml"));

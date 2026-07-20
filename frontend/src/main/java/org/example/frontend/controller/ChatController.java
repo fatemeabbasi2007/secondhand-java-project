@@ -95,7 +95,7 @@ public class ChatController {
     }
     }
 
-    private void loadMessages(Long conversationId) {
+    private void loadMessages(String conversationId) {
         try {
             List<MessageResponse> messages = chatService.getMessages(conversationId);
             messagesList.setAll(messages);

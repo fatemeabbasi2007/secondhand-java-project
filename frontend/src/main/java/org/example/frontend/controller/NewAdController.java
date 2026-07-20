@@ -22,10 +22,10 @@ public class NewAdController {
     private final AdvertisementService adService = new AdvertisementService();
 
     // تعریف متغیر در بالای کلاس NewAdController برای نگهداری آی‌دی آگهی در حالت ویرایش
-    private Long editingAdId = null;
+    private String editingAdId = null;
 
     // این متد برای پر کردن فیلدها در حالت ویرایش از طرف صفحه قبل صدا زده می‌شود
-    public void setAdDataForEdit(Long adId, String title, double price, String city, String category, String description, String text) {
+    public void setAdDataForEdit(String adId, String title, double price, String city, String category, String description, String text) {
         this.editingAdId = adId;
 
         titleField.setText(title);

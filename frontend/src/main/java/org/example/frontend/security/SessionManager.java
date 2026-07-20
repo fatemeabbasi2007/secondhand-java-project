@@ -4,7 +4,7 @@ public class SessionManager {
     private static SessionManager instance;
 
     private String token;
-    private Long userId;
+    private String userId;
     private String username;
     private String role;
 
@@ -18,7 +18,7 @@ public class SessionManager {
     }
 
     // ذخیره اطلاعات پس از ورود موفق
-    public void createSession(String token, Long userId, String username, String role) {
+    public void createSession(String token, String userId, String username, String role) {
         this.token = token;
         this.userId = userId;
         this.username = username;
@@ -39,7 +39,7 @@ public class SessionManager {
 
     // متدهای Getter
     public String getToken() { return token; }
-    public Long getUserId() { return userId; }
+    public String getUserId() { return userId; }
     public String getUsername() { return username; }
     public String getRole() { return role; }
 }

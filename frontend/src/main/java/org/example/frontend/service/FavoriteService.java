@@ -2,6 +2,7 @@ package org.example.frontend.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.frontend.config.ApiClient;
 import org.example.frontend.config.ApiConfig;
 import org.example.frontend.model.ErrorResponse;
 import org.example.frontend.model.FavoriteResponse;
@@ -19,18 +20,18 @@ public class FavoriteService {
     private final ObjectMapper objectMapper;
 
     public FavoriteService() {
-        this.client = HttpClient.newHttpClient();
+        // ۱. استفاده از ApiClient مشترک برای مدیریت کوکی سشن
+        this.client = ApiClient.getClient();
         this.objectMapper = new ObjectMapper();
     }
 
-    //  افزودن آگهی به علاقه‌مندی‌ها
-    public void addToFavorites(Long adId) throws Exception {
-        Long userId = SessionManager.getInstance().getUserId();
+    // افزودن آگهی به علاقه‌مندی‌ها
+    public void addToFavorites(String adId) throws Exception {
+        String userId = SessionManager.getInstance().getUserId();
         if (userId == null) throw new Exception("لطفاً ابتدا وارد حساب کاربری خود شوید.");
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(ApiConfig.BASE_URL + "/api/users/" + userId.toString() + "/favorites/" + adId))
-                //.header("Authorization", "Bearer " + token)
+                .uri(URI.create(ApiConfig.BASE_URL + "/api/users/" + userId + "/favorites/" + adId))
                 .POST(HttpRequest.BodyPublishers.noBody())
                 .build();
 
@@ -41,14 +42,13 @@ public class FavoriteService {
         }
     }
 
-    //  دریافت لیست علاقه‌مندی‌های کاربر
+    // دریافت لیست علاقه‌مندی‌های کاربر
     public List<FavoriteResponse> getFavorites() throws Exception {
-        Long userId = SessionManager.getInstance().getUserId();
+        String userId = SessionManager.getInstance().getUserId();
         if (userId == null) throw new Exception("لطفاً ابتدا وارد حساب کاربری خود شوید.");
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(ApiConfig.BASE_URL + "/api/users/" + userId + "/favorites"))
-                //.header("Authorization", "Bearer " + token)
                 .GET()
                 .build();
 
@@ -62,14 +62,13 @@ public class FavoriteService {
         }
     }
 
-    //  حذف آگهی از لیست علاقه‌مندی‌ها
-    public void removeFromFavorites(Long favoriteId) throws Exception {
-        Long userId = SessionManager.getInstance().getUserId();
+    // ۲. تغییر نوع favoriteId از Long به String
+    public void removeFromFavorites(String favoriteId) throws Exception {
+        String userId = SessionManager.getInstance().getUserId();
         if (userId == null) throw new Exception("لطفاً ابتدا وارد حساب کاربری خود شوید.");
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(ApiConfig.BASE_URL + "/api/users/" + userId.toString() + "/favorites/" + favoriteId))
-                //.header("Authorization", "Bearer " + token)
+                .uri(URI.create(ApiConfig.BASE_URL + "/api/users/" + userId + "/favorites/" + favoriteId))
                 .DELETE()
                 .build();
 

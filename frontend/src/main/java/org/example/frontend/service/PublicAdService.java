@@ -2,6 +2,7 @@ package org.example.frontend.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.frontend.config.ApiClient;
 import org.example.frontend.config.ApiConfig;
 import org.example.frontend.model.AdDetailsResponse;
 import org.example.frontend.model.AdResponse;
@@ -22,7 +23,8 @@ public class PublicAdService {
     private final ObjectMapper objectMapper;
 
     public PublicAdService() {
-        this.client = HttpClient.newHttpClient();
+        // ۱. استفاده از ApiClient مشترک برای ارسال کوکی سشن
+        this.client = ApiClient.getClient();
         this.objectMapper = new ObjectMapper();
     }
 
@@ -49,7 +51,6 @@ public class PublicAdService {
             urlBuilder.append("maxPrice=").append(maxPrice).append("&");
         }
 
-        // حذف آخرین کاراکتر '&' یا '?' در صورت وجود
         String finalUrl = urlBuilder.toString();
         if (finalUrl.endsWith("&") || finalUrl.endsWith("?")) {
             finalUrl = finalUrl.substring(0, finalUrl.length() - 1);
@@ -74,10 +75,10 @@ public class PublicAdService {
         }
     }
 
-    // دریافت جزئیات کامل آگهی با شناسه مشخص
-    public AdDetailsResponse getAdvertisementDetails(Long adId) throws Exception {
+    // ۲. تغییر نوع adId از Long به String
+    public AdDetailsResponse getAdvertisementDetails(String adId) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(ApiConfig.BASE_URL + "/api/advertisements/" + adId)) // آدرسی مثل GET /api/advertisements/5
+                .uri(URI.create(ApiConfig.BASE_URL + "/api/advertisements/" + adId))
                 .GET()
                 .build();
 
@@ -95,14 +96,13 @@ public class PublicAdService {
         }
     }
 
-    // متد حذف آگهی با ارسال درخواست DELETE به بک‌اند
-    public void deleteAdvertisement(Long adId) throws Exception {
-        String token = SessionManager.getInstance().getToken();
-        if (token == null) throw new Exception("جهت انجام عملیات ابتدا وارد حساب خود شوید.");
+    // ۳. تغییر نوع adId به String و کنترل ورود از روی userId
+    public void deleteAdvertisement(String adId) throws Exception {
+        String userId = SessionManager.getInstance().getUserId();
+        if (userId == null) throw new Exception("جهت انجام عملیات ابتدا وارد حساب خود شوید.");
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(ApiConfig.BASE_URL + "/api/advertisements/own/" + adId))
-                //.header("Authorization", "Bearer " + token)
                 .DELETE()
                 .build();
 
@@ -118,18 +118,22 @@ public class PublicAdService {
         }
     }
 
-    public void markAsSold(Long adId) throws Exception {
-        java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
-                .uri(java.net.URI.create(ApiConfig.BASE_URL + "/api/advertisements/own/" + adId + "/sold"))
-                .method("PATCH", java.net.http.HttpRequest.BodyPublishers.noBody())
+    // ۴. تغییر نوع adId به String
+    public void markAsSold(String adId) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(ApiConfig.BASE_URL + "/api/advertisements/own/" + adId + "/sold"))
+                .method("PATCH", HttpRequest.BodyPublishers.noBody())
                 .build();
 
-        java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() != 200) {
-            // مدیریت و خواندن خطای بک‌آند
-            ErrorResponse error = objectMapper.readValue(response.body(), ErrorResponse.class);
-            throw new Exception(error.getMessage());
+            try {
+                ErrorResponse error = objectMapper.readValue(response.body(), ErrorResponse.class);
+                throw new Exception(error.getMessage());
+            } catch (Exception e) {
+                throw new Exception("خطا در تغییر وضعیت آگهی. کد وضعیت: " + response.statusCode());
+            }
         }
     }
 }

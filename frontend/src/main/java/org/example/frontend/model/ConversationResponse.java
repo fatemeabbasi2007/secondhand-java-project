@@ -3,8 +3,8 @@ package org.example.frontend.model;
 import java.time.LocalDateTime;
 
 public class ConversationResponse {
-    private Long conversationId;
-    private Long advertisementId;
+    private String conversationId;
+    private String advertisementId;
     private String title;
     private String otherPartyUsername;
     private String lastMessagePreview;
@@ -12,7 +12,7 @@ public class ConversationResponse {
 
     public ConversationResponse() {}
 
-    public ConversationResponse(Long conversationId, Long advertisementId, String advertisementTitle,
+    public ConversationResponse(String conversationId, String advertisementId, String advertisementTitle,
                                 String otherPartyUsername, String lastMessage, LocalDateTime lastMessageTime) {
         this.conversationId = conversationId;
         this.advertisementId = advertisementId;
@@ -22,11 +22,11 @@ public class ConversationResponse {
         this.lastMessageAt = lastMessageTime;
     }
 
-    public Long getConversationId() { return conversationId; }
-    public void setConversationId(Long conversationId) { this.conversationId = conversationId; }
+    public String getConversationId() { return conversationId; }
+    public void setConversationId(String conversationId) { this.conversationId = conversationId; }
 
-    public Long getAdvertisementId() { return advertisementId; }
-    public void setAdvertisementId(Long advertisementId) { this.advertisementId = advertisementId; }
+    public String getAdvertisementId() { return advertisementId; }
+    public void setAdvertisementId(String advertisementId) { this.advertisementId = advertisementId; }
 
     public String getAdvertisementTitle() { return title; }
     public void setAdvertisementTitle(String advertisementTitle) { this.title = advertisementTitle; }

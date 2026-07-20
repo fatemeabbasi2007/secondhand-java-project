@@ -1,5 +1,6 @@
 package org.example.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -14,6 +15,8 @@ public class Advertisement {
     private String description;      // Searched by keyword
     private double price;            // Filtered by min/max price, sortable
     private String city;             // Filtered by city
+
+    @JsonAlias("category") // 👈 این خط را اضافه کنید
     private String categoryId;       // e.g., "ELECTRONICS", "VEHICLES"
     private String ownerId;          // Link to the User who created it
     private String rejectionReason;

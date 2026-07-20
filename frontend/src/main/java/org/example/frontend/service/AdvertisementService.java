@@ -1,6 +1,7 @@
 package org.example.frontend.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.frontend.config.ApiClient;
 import org.example.frontend.config.ApiConfig;
 import org.example.frontend.model.AdvertisementRequest;
 import org.example.frontend.model.ErrorResponse;
@@ -17,14 +18,14 @@ public class AdvertisementService {
     private final ObjectMapper objectMapper;
 
     public AdvertisementService() {
-        this.client = HttpClient.newHttpClient();
+        this.client = ApiClient.getClient();
         this.objectMapper = new ObjectMapper();
     }
 
     public void createAdvertisement(String title, String description, double price, String city, String category, List<String> imageUrls) throws Exception {
         // دریافت توکن کاربر از سشن
-        String token = SessionManager.getInstance().getToken();
-        if (token == null) {
+        String userId = SessionManager.getInstance().getUserId();
+        if (userId == null) {
             throw new Exception("شما وارد حساب کاربری خود نشده‌اید.");
         }
 
@@ -71,9 +72,9 @@ public class AdvertisementService {
     }
 
     // ارسال درخواست ویرایش آگهی به بک‌اند با متد PUT
-    public void updateAdvertisement(Long adId, String title, String description, double price, String city, String category, List<String> imageUrls) throws Exception {
+    public void updateAdvertisement(String adId, String title, String description, double price, String city, String category, List<String> imageUrls) throws Exception {
         //  بررسی لاگین بودن کاربر از روی سشن
-        Long userId = SessionManager.getInstance().getUserId();
+        String userId = SessionManager.getInstance().getUserId();
         if (userId == null) {
             throw new Exception("شما وارد حساب کاربری خود نشده‌اید.");
         }

@@ -1,7 +1,7 @@
 package org.example.frontend.model;
 
 public class UserResponse {
-    private Long id;
+    private String id;
     private String fullName;
     private String username;
     private String phoneNum;
@@ -11,7 +11,7 @@ public class UserResponse {
 
     public UserResponse() {}
 
-    public UserResponse(Long id, String fullName, String username, String phoneNumber, String email, String role, boolean blocked) {
+    public UserResponse(String id, String fullName, String username, String phoneNumber, String email, String role, boolean blocked) {
         this.id = id;
         this.fullName = fullName;
         this.username = username;
@@ -22,8 +22,8 @@ public class UserResponse {
     }
 
     // متدهای Getter و Setter
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
     public String getFullName() { return fullName; }
     public void setFullName(String fullName) { this.fullName = fullName; }

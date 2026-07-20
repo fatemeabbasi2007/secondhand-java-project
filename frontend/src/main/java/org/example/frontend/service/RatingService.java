@@ -1,6 +1,7 @@
 package org.example.frontend.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.frontend.config.ApiClient;
 import org.example.frontend.config.ApiConfig;
 import org.example.frontend.model.ErrorResponse;
 import org.example.frontend.model.RateSellerRequest;
@@ -17,24 +18,26 @@ public class RatingService {
     private final ObjectMapper objectMapper;
 
     public RatingService() {
-        this.client = HttpClient.newHttpClient();
+        // ۱. استفاده از ApiClient مشترک به جای ساخت HttpClient جدید
+        this.client = ApiClient.getClient();
         this.objectMapper = new ObjectMapper();
     }
 
     // ارسال امتیاز به بک‌اند
-    public void rateSeller(Long adId, int rating, String comment) throws Exception {
-        String token = SessionManager.getInstance().getToken();
-        if (token == null) {
+    public void rateSeller(String adId, int rating, String comment) throws Exception {
+        // ۲. تغییر بررسی لاگین بر اساس userId
+        String userId = SessionManager.getInstance().getUserId();
+        if (userId == null) {
             throw new Exception("برای ثبت امتیاز ابتدا باید وارد حساب کاربری خود شوید.");
         }
 
         RateSellerRequest rateRequest = new RateSellerRequest(adId, rating, comment);
         String jsonBody = objectMapper.writeValueAsString(rateRequest);
 
+        // ۳. حذف هدر Authorization به دلیل مدیریت سشن با کوکی
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(ApiConfig.BASE_URL + "/api/ratings"))
                 .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + token)
                 .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                 .build();
 

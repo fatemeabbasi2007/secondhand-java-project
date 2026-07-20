@@ -1,6 +1,7 @@
 package org.example.frontend.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.frontend.config.ApiClient;
 import org.example.frontend.config.ApiConfig;
 import org.example.frontend.model.ErrorResponse;
 import org.example.frontend.model.LoginRequest;
@@ -17,7 +18,7 @@ public class AuthService {
     private final ObjectMapper objectMapper; // ابزار تبدیل شیء به JSON و برعکس
 
     public AuthService() {
-        this.client = HttpClient.newHttpClient();
+        this.client = ApiClient.getClient();
         this.objectMapper = new ObjectMapper();
     }
 

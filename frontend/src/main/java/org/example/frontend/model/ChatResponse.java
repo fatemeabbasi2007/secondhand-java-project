@@ -1,8 +1,8 @@
 package org.example.frontend.model;
 
 public class ChatResponse {
-    private Long conversationId;
-    private Long advertisementId;
+    private String conversationId;
+    private String advertisementId;
     private String advertisementTitle;
     private String otherPartyUsername;
     private String lastMessage;
@@ -10,7 +10,7 @@ public class ChatResponse {
 
     public ChatResponse() {}
 
-    public ChatResponse(Long conversationId, Long advertisementId, String advertisementTitle, String otherPartyUsername, String lastMessage, String lastMessageTime) {
+    public ChatResponse(String conversationId, String advertisementId, String advertisementTitle, String otherPartyUsername, String lastMessage, String lastMessageTime) {
         this.conversationId = conversationId;
         this.advertisementId = advertisementId;
         this.advertisementTitle = advertisementTitle;
@@ -20,11 +20,11 @@ public class ChatResponse {
     }
 
     // متدهای Getter و Setter
-    public Long getConversationId() { return conversationId; }
-    public void setConversationId(Long conversationId) { this.conversationId = conversationId; }
+    public String  getConversationId() { return conversationId; }
+    public void setConversationId(String conversationId) { this.conversationId = conversationId; }
 
-    public Long getAdvertisementId() { return advertisementId; }
-    public void setAdvertisementId(Long advertisementId) { this.advertisementId = advertisementId; }
+    public String getAdvertisementId() { return advertisementId; }
+    public void setAdvertisementId(String advertisementId) { this.advertisementId = advertisementId; }
 
     public String getAdvertisementTitle() { return advertisementTitle; }
     public void setAdvertisementTitle(String advertisementTitle) { this.advertisementTitle = advertisementTitle; }

@@ -2,6 +2,7 @@ package org.example.frontend.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.frontend.config.ApiClient;
 import org.example.frontend.config.ApiConfig;
 import org.example.frontend.model.*;
 import org.example.frontend.security.SessionManager;
@@ -20,23 +21,23 @@ public class ChatService {
     private final ObjectMapper objectMapper;
 
     public ChatService() {
-        this.client = HttpClient.newHttpClient();
+        // ۱. استفاده از کلاینت مشترک همراه با کوکی سشن
+        this.client = ApiClient.getClient();
         this.objectMapper = new ObjectMapper();
     }
 
-    // ارسال درخواست شروع گفت‌وگو یا فرستادن اولین پیام
-    public void startConversation(Long adId, String messageText) throws Exception {
-        String token = SessionManager.getInstance().getToken();
-        if (token == null) {
+    // ۲. ارسال درخواست شروع گفت‌وگو با adId از نوع String
+    public void startConversation(String adId, String messageText) throws Exception {
+        String userId = SessionManager.getInstance().getUserId();
+        if (userId == null) {
             throw new Exception("جهت شروع گفت‌وگو ابتدا باید وارد حساب خود شوید.");
         }
 
         StartChatRequest chatRequest = new StartChatRequest(adId, messageText);
         String jsonBody = objectMapper.writeValueAsString(chatRequest);
 
-        // آدرس متد به همراه RequestParam
         String url = ApiConfig.BASE_URL + "/api/chats/send?advertisementId=" +
-                URLEncoder.encode(adId.toString(), StandardCharsets.UTF_8);
+                URLEncoder.encode(adId, StandardCharsets.UTF_8);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
@@ -47,25 +48,17 @@ public class ChatService {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() != 200 && response.statusCode() != 201) {
-            try {
-                ErrorResponse error = objectMapper.readValue(response.body(), ErrorResponse.class);
-                throw new Exception(error.getMessage());
-            } catch (Exception e) {
-                if (response.body() != null && !response.body().isBlank()) {
-                    throw new Exception(response.body());
-                }
-                throw new Exception("خطا در ایجاد گفت‌وگو. کد وضعیت: " + response.statusCode());
-            }
+            handleErrorResponse(response);
         }
     }
 
+    // دریافت لیست گفت‌وگوهای کاربر
     public List<ConversationResponse> getConversations() throws Exception {
-        String token = SessionManager.getInstance().getToken();
-        if (token == null) throw new Exception("کاربر وارد سیستم نشده است.");
+        String userId = SessionManager.getInstance().getUserId();
+        if (userId == null) throw new Exception("کاربر وارد سیستم نشده است.");
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(ApiConfig.BASE_URL + "/api/chats/conversations"))
-                //.header("Authorization", "Bearer " + token)
                 .GET()
                 .build();
 
@@ -79,10 +72,10 @@ public class ChatService {
         }
     }
 
-    // ۲. دریافت پیام‌های یک گفت‌وگو به ترتیب زمان
-    public List<MessageResponse> getMessages(Long conversationId) throws Exception {
-        String token = SessionManager.getInstance().getToken();
-        if (token == null) throw new Exception("کاربر وارد سیستم نشده است.");
+    // ۳. دریافت پیام‌های یک گفت‌وگو با conversationId از نوع String
+    public List<MessageResponse> getMessages(String conversationId) throws Exception {
+        String userId = SessionManager.getInstance().getUserId();
+        if (userId == null) throw new Exception("کاربر وارد سیستم نشده است.");
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(ApiConfig.BASE_URL + "/api/chats/conversations/" + conversationId + "/messages"))
@@ -99,10 +92,10 @@ public class ChatService {
         }
     }
 
-    // ۳. ارسال پیام جدید در گفت‌وگو
+    // ۴. ارسال پیام جدید در گفت‌وگو
     public void sendMessage(String adId, String content) throws Exception {
-        String token = SessionManager.getInstance().getToken();
-        if (token == null) throw new Exception("کاربر وارد سیستم نشده است.");
+        String userId = SessionManager.getInstance().getUserId();
+        if (userId == null) throw new Exception("کاربر وارد سیستم نشده است.");
 
         SendMessageRequest sendRequest = new SendMessageRequest(content);
         String jsonBody = objectMapper.writeValueAsString(sendRequest);
@@ -126,7 +119,6 @@ public class ChatService {
     private void handleErrorResponse(HttpResponse<String> response) throws Exception {
         try {
             ErrorResponse error = objectMapper.readValue(response.body(), ErrorResponse.class);
-
             throw new Exception(error.getMessage());
         } catch (Exception e) {
             if (response.body() != null && !response.body().isBlank()) {
