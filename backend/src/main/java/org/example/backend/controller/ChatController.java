@@ -48,7 +48,7 @@ public class ChatController {
         }
     }
 
-    @GetMapping("/conversations/")
+    @GetMapping("/conversations")
     public ResponseEntity<?> getUserInbox(HttpSession session) {
         User loggedInUser = (User) session.getAttribute("user");
         if (loggedInUser == null) {

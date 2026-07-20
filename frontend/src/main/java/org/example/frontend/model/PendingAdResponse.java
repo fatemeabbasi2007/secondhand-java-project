@@ -1,15 +1,31 @@
 package org.example.frontend.model;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true) // جلوگیری از کرش برنامه‌ در صورت وجود فیلدهای اضافی
 public class PendingAdResponse {
+
     private String id;
     private String title;
     private String description;
     private double price;
+
+    @JsonAlias({"cityName", "city"})
     private String city;
+
+    @JsonAlias({"categoryId", "category"})
     private String category;
+
+    @JsonProperty("ownerId")
+    @JsonAlias({"ownerUsername", "ownerId"}) // هماهنگی ownerId بک‌اند با ownerUsername
     private String ownerUsername;
+
+    @JsonProperty("imageUrl")
+    @JsonAlias({"imageUrlsList", "imageUrls", "imageUrl"}) // هماهنگی imageUrl بک‌اند با imageUrlsList
     private List<String> imageUrlsList;
 
     public PendingAdResponse() {}
@@ -24,7 +40,7 @@ public class PendingAdResponse {
         this.ownerUsername = ownerUsername;
     }
 
-    // متدهای Getter و Setter
+    // --- Getterها و Setterها ---
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
@@ -46,6 +62,6 @@ public class PendingAdResponse {
     public String getOwnerUsername() { return ownerUsername; }
     public void setOwnerUsername(String ownerUsername) { this.ownerUsername = ownerUsername; }
 
-    public List<String> getImageUrlsList() {return imageUrlsList;}
-    public void setImageUrlsList(List<String> imageUrlsList) {this.imageUrlsList = imageUrlsList;}
+    public List<String> getImageUrlsList() { return imageUrlsList; }
+    public void setImageUrlsList(List<String> imageUrlsList) { this.imageUrlsList = imageUrlsList; }
 }
