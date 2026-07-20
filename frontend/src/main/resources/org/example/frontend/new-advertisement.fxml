@@ -15,7 +15,11 @@
     <TextArea fx:id="descriptionField" promptText="توضیحات آگهی *" prefHeight="100.0"/>
     <TextField fx:id="priceField" promptText="قیمت (تومان) *"/>
     <TextField fx:id="cityField" promptText="شهر *"/>
-    <TextField fx:id="categoryField" promptText="دسته بندی *"/>
+    <VBox spacing="5.0">
+        <Label text="دسته‌بندی" textFill="#57606F" />
+        <ComboBox fx:id="categoryComboBox" promptText="انتخاب کنید..." prefWidth="300.0"
+                  style="-fx-background-color: #F1F2F6; -fx-background-radius: 5;"/>
+    </VBox>
     <TextField fx:id="imageUrlsField" promptText="آدرس عکس *"/>
 
     <HBox alignment="CENTER" spacing="20.0" style="-fx-padding: 10 0 0 0;">

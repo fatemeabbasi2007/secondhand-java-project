@@ -44,7 +44,7 @@ public class AdvertisementService {
         }
 
         // ۲. آماده‌سازی بدنه جی‌سان فقط برای اطلاعات متنی آگهی
-        AdvertisementRequest adRequest = new AdvertisementRequest(title, description, price, city, category);
+        AdvertisementRequest adRequest = new AdvertisementRequest(title, description, price, city, toCategoryId(category));
         String jsonBody = objectMapper.writeValueAsString(adRequest);
 
         // ۳. ساخت درخواست HTTP POST (بدون توکن و هدر احراز هویت)
@@ -80,7 +80,7 @@ public class AdvertisementService {
         }
 
         //  ساخت شیء درخواست به همراه آیدی آگهی
-        AdvertisementRequest adRequest = new AdvertisementRequest(adId.toString(), title, description, price, city, category, imageUrls);
+        AdvertisementRequest adRequest = new AdvertisementRequest(adId, title, description, price, city, toCategoryId(category), imageUrls);
         String jsonBody = objectMapper.writeValueAsString(adRequest);
 
         // ۳. ارسال درخواست PUT کاملاً سشن‌محور و بدون توکن هدر
@@ -100,6 +100,45 @@ public class AdvertisementService {
             } catch (Exception e) {
                 throw new Exception("خطا در ویرایش آگهی، کد وضعیت: " + response.statusCode());
             }
+        }
+    }
+
+    private String toCategoryId (String category) {
+        switch (category.trim()) {
+
+            case "وسایل نقلیه":
+                return "VEHICLES";
+            case "خودرو":
+                return "CARS";
+            case "موتورسیکلت":
+                return "MOTORCYCLES";
+
+            case "املاک":
+                return "REAL_ESTATE";
+            case "آپارتمان و مسکونی":
+                return "APARTMENTS";
+            case "اداری و تجاری":
+                return "COMMERCIAL";
+
+            case "لوازم الکترونیکی":
+                return "ELECTRONICS";
+            case "موبایل و تبلت":
+                return "MOBILE_PHONES";
+            case "لپ‌تاپ و کامپیوتر":
+                return "LAPTOPS";
+
+            case "وسایل خانه و آشپزخانه":
+                return "HOME_GOODS";
+            case "مبلمان و لوازم چوبی":
+                return "FURNITURE";
+
+            case "وسایل شخصی":
+                return "PERSONAL_ITEMS";
+            case "پوشاک و کیف و کفش":
+                return "CLOTHING";
+
+            default:
+                return "";
         }
     }
 }
