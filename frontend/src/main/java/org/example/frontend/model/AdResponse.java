@@ -1,15 +1,31 @@
 package org.example.frontend.model;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AdResponse {
+
     private String id;
     private String title;
     private String description;
     private double price;
+
+    @JsonAlias({"cityName", "city"})
     private String city;
+
+    @JsonAlias({"categoryId", "categoryName", "category"})
     private String category;
+
+    @JsonProperty("ownerUsername")
+    @JsonAlias({"ownerId", "ownerName", "ownerUsername"})
     private String ownerUsername;
+
+    @JsonProperty("imageUrlsList")
+    @JsonAlias({"imageUrls", "imageUrl", "imageUrlsList"})
     private List<String> imageUrlsList;
 
     public AdResponse() {}
@@ -22,10 +38,9 @@ public class AdResponse {
         this.city = city;
         this.category = category;
         this.ownerUsername = ownerUsername;
-
     }
 
-    // متدهای Getter و Setter
+    // --- Getterها و Setterها ---
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
@@ -47,6 +62,6 @@ public class AdResponse {
     public String getOwnerUsername() { return ownerUsername; }
     public void setOwnerUsername(String ownerUsername) { this.ownerUsername = ownerUsername; }
 
-    public List<String> getImageUrlsList() {return imageUrlsList;}
-    public void setImageUrlsList(List<String> imageUrlsList) {this.imageUrlsList = imageUrlsList;}
+    public List<String> getImageUrlsList() { return imageUrlsList; }
+    public void setImageUrlsList(List<String> imageUrlsList) { this.imageUrlsList = imageUrlsList; }
 }

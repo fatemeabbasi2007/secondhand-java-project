@@ -1,45 +1,53 @@
 package org.example.frontend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserResponse {
+
     private String id;
-    private String fullName;
     private String username;
-    private String phoneNum;
+    private String fullName;
     private String email;
+    private String phoneNumber;
     private String role;
-    private boolean enable; // وضعیت مسدود بودن کاربر
+
+    // بک‌اند فیلد enabled را می‌فرستد (true = فعال، false = مسدود)
+    @JsonProperty("enabled")
+    private boolean enabled = true;
 
     public UserResponse() {}
 
-    public UserResponse(String id, String fullName, String username, String phoneNumber, String email, String role, boolean blocked) {
-        this.id = id;
-        this.fullName = fullName;
-        this.username = username;
-        this.phoneNum = phoneNumber;
-        this.email = email;
-        this.role = role;
-        this.enable = blocked;
+    // --- منطق وضعیت مسدود بودن ---
+    // اگر enabled برابر false باشد، یعنی کاربر مسدود شده است
+    public boolean isBlocked() {
+        return !enabled;
     }
 
-    // متدهای Getter و Setter
+    public void setBlocked(boolean blocked) {
+        this.enabled = !blocked;
+    }
+
+    // --- Getterها و Setterهای استاندارد ---
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
-
-    public String getFullName() { return fullName; }
-    public void setFullName(String fullName) { this.fullName = fullName; }
 
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
 
-    public String getPhoneNumber() { return phoneNum; }
-    public void setPhoneNumber(String phoneNumber) { this.phoneNum = phoneNumber; }
+    public String getFullName() { return fullName; }
+    public void setFullName(String fullName) { this.fullName = fullName; }
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
+    public String getPhoneNumber() { return phoneNumber; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
 
-    public boolean isBlocked() { return enable; }
-    public void setBlocked(boolean blocked) { this.enable = blocked; }
+    public boolean isEnabled() { return enabled; }
+    public void setEnabled(boolean enabled) { this.enabled = enabled; }
 }
