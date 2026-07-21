@@ -164,7 +164,7 @@ public class AdDetailsController {
 
         try {
             javafx.stage.Stage stage = (javafx.stage.Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/org/example/frontend/new-ad.fxml"));
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/org/example/frontend/new-advertisement.fxml"));
             javafx.scene.Parent root = loader.load();
 
             NewAdController editController = loader.getController();
