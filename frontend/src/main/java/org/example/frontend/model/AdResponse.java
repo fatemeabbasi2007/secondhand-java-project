@@ -21,7 +21,7 @@ public class AdResponse {
     private String category;
 
     @JsonProperty("ownerUsername")
-    @JsonAlias({"ownerId", "ownerName", "ownerUsername"})
+    @JsonAlias({ "ownerName", "ownerUsername"})
     private String ownerUsername;
 
     @JsonProperty("imageUrlsList")
