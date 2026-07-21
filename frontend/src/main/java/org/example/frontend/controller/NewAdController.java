@@ -209,7 +209,7 @@ public class NewAdController {
 
         java.util.List<String> imageUrlsList = new java.util.ArrayList<>();
         if (!urlsText.isEmpty()) {
-            for (String url : urlsText.split(",")) {
+            for (String url : urlsText.split("\\|")) {
                 if (!url.trim().isEmpty()) {
                     imageUrlsList.add(url.trim());
                 }
@@ -307,7 +307,7 @@ public class NewAdController {
                 }
 
                 // ۳. چسباندن رشته‌ها به هم با علامت ویرگول (,)
-                String combinedUrls = String.join(",", base64List);
+                String combinedUrls = String.join("|", base64List);
                 imageUrlsField.setText(combinedUrls);
 
                 // ۴. نمایش پیش‌نمایش اولین عکس انتخاب‌شده
