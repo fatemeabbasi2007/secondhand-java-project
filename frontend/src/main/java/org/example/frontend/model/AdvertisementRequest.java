@@ -13,33 +13,30 @@ public class AdvertisementRequest {
     private String description;
     private double price;
     private String city;
+
+    @JsonProperty("categoryId")
     private String categoryId;
 
-    @JsonProperty("categoryId") // موقع تبدیل به JSON حتماً کلید categoryId تولید می‌کند
-    private String category;
-
-    @JsonProperty("imageUrls") // موقع تبدیل به JSON کلید imageUrls تولید می‌کند
+    @JsonProperty("imageUrls")
     private List<String> imageUrlsList;
 
     public AdvertisementRequest() {}
 
-    public AdvertisementRequest(String title, String description, double price, String city, String category) {
+    public AdvertisementRequest(String title, String description, double price, String city, String categoryId) {
         this.title = title;
         this.description = description;
         this.price = price;
         this.city = city;
-        this.categoryId = category;
-
-        this.category = category;
+        this.categoryId = categoryId;
     }
 
-    public AdvertisementRequest(String id, String title, String description, double price, String city, String category, List<String> imageUrlsList) {
+    public AdvertisementRequest(String id, String title, String description, double price, String city, String categoryId, List<String> imageUrlsList) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.price = price;
         this.city = city;
-        this.categoryId = category;
+        this.categoryId = categoryId;
         this.imageUrlsList = imageUrlsList;
     }
 
@@ -57,7 +54,7 @@ public class AdvertisementRequest {
     public void setCity(String city) { this.city = city; }
 
     public String getCategory() { return categoryId; }
-    public void setCategory(String category) { this.categoryId = category; }
+    public void setCategory(String categoryId) { this.categoryId = categoryId; }
 
     public List<String> getImageUrlsList() { return imageUrlsList; }
     public void setImageUrlsList(List<String> imageUrlsList) { this.imageUrlsList = imageUrlsList; }

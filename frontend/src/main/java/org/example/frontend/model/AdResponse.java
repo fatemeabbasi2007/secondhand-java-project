@@ -16,13 +16,12 @@ public class AdResponse {
 
     @JsonAlias({"cityName", "city"})
     private String city;
-    private String categoryId;
 
     @JsonAlias({"categoryId", "categoryName", "category"})
-    private String category;
+    private String categoryId;
 
     @JsonProperty("ownerUsername")
-    @JsonAlias({ "ownerName", "ownerUsername"})
+    @JsonAlias({"ownerName", "ownerUsername", "ownerId"})
     private String ownerUsername;
 
     @JsonProperty("imageUrlsList")
@@ -31,17 +30,6 @@ public class AdResponse {
 
     public AdResponse() {}
 
-    public AdResponse(String id, String title, String description, double price, String city, String category, String ownerUsername) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.price = price;
-        this.city = city;
-        this.categoryId = category;
-        this.ownerUsername = ownerUsername;
-    }
-
-    // --- Getterها و Setterها ---
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
@@ -57,53 +45,34 @@ public class AdResponse {
     public String getCity() { return city; }
     public void setCity(String city) { this.city = city; }
 
-    public String getCategory() { return toCategoryId(categoryId); }
-    public void setCategory(String category) { this.categoryId = category; }
+    public String getCategoryId() { return categoryId; }
+    public void setCategoryId(String categoryId) { this.categoryId = categoryId; }
 
-    public String getOwnerUsername() { return ownerUsername; }
+    public String getCategory() { return toCategoryName(categoryId); }
+
+    public String getOwnerUsername() { return ownerUsername != null ? ownerUsername : "نامشخص"; }
     public void setOwnerUsername(String ownerUsername) { this.ownerUsername = ownerUsername; }
 
-    public List<String> getImageUrlsList() {return imageUrlsList;}
-    public void setImageUrlsList(List<String> imageUrlsList) {this.imageUrlsList = imageUrlsList;}
+    public List<String> getImageUrlsList() { return imageUrlsList; }
+    public void setImageUrlsList(List<String> imageUrlsList) { this.imageUrlsList = imageUrlsList; }
 
-    private String toCategoryId (String category) {
-        switch (category.trim()) {
-
-            case "VEHICLES":
-                return "وسایل نقلیه";
-            case "CARS":
-                return "خودرو";
-            case "MOTORCYCLES":
-                return "موتورسیکلت";
-
-            case "REAL_ESTATE":
-                return "املاک";
-            case "APARTMENTS":
-                return "آپارتمان و مسکونی";
-            case "COMMERCIAL":
-                return "اداری و تجاری";
-
-            case "ELECTRONICS":
-                return "لوازم الکترونیکی";
-            case "MOBILE_PHONES":
-                return "موبایل و تبلت";
-            case "LAPTOPS":
-                return "لپ‌تاپ و کامپیوتر";
-
-            case "HOME_GOODS":
-                return "وسایل خانه و آشپزخانه";
-            case "FURNITURE":
-                return "مبلمان و لوازم چوبی";
-
-            case "PERSONAL_ITEMS":
-                return "وسایل شخصی";
-            case "CLOTHING":
-                return "پوشاک و کیف و کفش";
-
-            default:
-                return "";
+    private String toCategoryName(String cat) {
+        if (cat == null || cat.trim().isEmpty()) return "سایر";
+        switch (cat.trim()) {
+            case "VEHICLES": return "وسایل نقلیه";
+            case "CARS": return "خودرو";
+            case "MOTORCYCLES": return "موتورسیکلت";
+            case "REAL_ESTATE": return "املاک";
+            case "APARTMENTS": return "آپارتمان و مسکونی";
+            case "COMMERCIAL": return "اداری و تجاری";
+            case "ELECTRONICS": return "لوازم الکترونیکی";
+            case "MOBILE_PHONES": return "موبایل و تبلت";
+            case "LAPTOPS": return "لپ‌تاپ و کامپیوتر";
+            case "HOME_GOODS": return "وسایل خانه و آشپزخانه";
+            case "FURNITURE": return "مبلمان و لوازم چوبی";
+            case "PERSONAL_ITEMS": return "وسایل شخصی";
+            case "CLOTHING": return "پوشاک و کیف و کفش";
+            default: return cat;
         }
     }
-//    public List<String> getImageUrlsList() { return imageUrlsList; }
-//    public void setImageUrlsList(List<String> imageUrlsList) { this.imageUrlsList = imageUrlsList; }
 }

@@ -8,6 +8,7 @@ import java.util.Map;
 
 
 @Data
+
 public class AdvertisementDetailDTO {
     // مرحله ۴: اطلاعات پایه آگهی
     private String id;
@@ -19,6 +20,8 @@ public class AdvertisementDetailDTO {
     private String categoryName; // ارسال نام دسته بندی علاوه بر ID کار فرانت را راحت می‌کند
     private List<String> imageUrls;
     private LocalDateTime createdAt;
+
+
 
     // مرحله ۴: ویژگی‌های اختصاصی (مثلا کیلومتر برای ماشین، متراژ برای ملک)
     private List<AttributeRenderDTO> specificAttributes;
@@ -39,14 +42,25 @@ public class AdvertisementDetailDTO {
 
     // مرحله ۵ و ۷: اطلاعات فروشنده برای نمایش و شروع گفت‌وگو
     private String ownerId;
-    private String ownerName;
-    private Double ownerAverageRating; // میانگین امتیاز فروشنده
+    private String ownerUsername;
+    private Double sellerRating; // میانگین امتیاز فروشنده
 
     // مرحله ۸: فلگ کمکی برای کنترل وضعیت دکمه‌های UI در فرانت‌اند
     private boolean isOwner;
 
     // Constructor ها، Getter ها و Setter ها
-    public AdvertisementDetailDTO() {}
+    public AdvertisementDetailDTO(Advertisement ad, String ownerUsername, Double sellerRating) {
+        this.id = ad.getId();
+        this.title = ad.getTitle();
+        this.description = ad.getDescription();
+        this.price = ad.getPrice();
+        this.city = ad.getCity();
+        this.categoryName = ad.getCategoryId();
+        this.categoryId = ad.getCategoryId();
+        this.ownerUsername = ownerUsername;
+        this.sellerRating = sellerRating;
+        this.imageUrls = ad.getImageUrls();
+    }
 
     // ... (Getter/Setter ها در این بخش قرار می‌گیرند)
 }

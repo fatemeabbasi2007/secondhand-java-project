@@ -2,10 +2,7 @@ package org.example.backend.controller;
 
 import jakarta.servlet.http.HttpSession;
 import org.example.backend.exeption.*;
-import org.example.backend.model.AdminPendingAdDTO;
-import org.example.backend.model.Advertisement;
-import org.example.backend.model.AdvertisementDetailDTO;
-import org.example.backend.model.User;
+import org.example.backend.model.*;
 import org.example.backend.service.AdvertisementService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,20 +35,20 @@ public class AdvertisementController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("برای جستجو و مشاهده آگهی ها، ابتدا باید وارد سامانه شوید"));
         }
 
-            List<Advertisement> chosenAds = advertisementService.searchAndFilterActiveAds(keyword , categoryId , city , minPrice , maxPrice);
+            List<AdSearchDTO> chosenAds = advertisementService.searchAndFilterActiveAds(keyword , categoryId , city , minPrice , maxPrice);
             return ResponseEntity.ok(chosenAds);
 
     }
 
-    @GetMapping("/{advertisemetId}")
-    public ResponseEntity<?> getAdDetail(@PathVariable String advertisemetId , HttpSession session) {
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getAdDetail(@PathVariable String id , HttpSession session) {
         User user =(User) session.getAttribute("user");
         if ( user == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("ابتدا وارد سامانه شوید"));
         }
 
         try{
-            AdvertisementDetailDTO advertisement = advertisementService.getActiveAdvertisementDetail(advertisemetId , user.getId());
+            AdvertisementDetailDTO advertisement = advertisementService.getActiveAdvertisementDetail(id , user.getId());
             return ResponseEntity.ok(advertisement);
 
         }catch (UserNotFoundException | AdvertisementNotFoundException e ){

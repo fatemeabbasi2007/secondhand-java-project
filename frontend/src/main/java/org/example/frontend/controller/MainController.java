@@ -77,8 +77,13 @@ public class MainController {
         // بارگذاری اولیه کل آگهی‌های فعال
         onSearchClick(null);
 
-        categoryComboBox.getItems().addAll("وسایل نقلیه", "خودرو", "موتور سیکلت", "املاک", "آپارتمان و مسکونی", "اداری و تجاری", "لوازم الکتریکی", "موبایل و تبلت", "لپ تاپ و کامپیوتر", "وسایل خانه و آشپزخانه", "مبلمان و لوازم چوبی", "وسایل شخصی", "پوشاک و کیف و کفش");
-    }
+        categoryComboBox.getItems().setAll(
+                "وسایل نقلیه", "خودرو", "موتورسیکلت",
+                "املاک", "آپارتمان و مسکونی", "اداری و تجاری",
+                "لوازم الکترونیکی", "موبایل و تبلت", "لپ‌تاپ و کامپیوتر",
+                "وسایل خانه و آشپزخانه", "مبلمان و لوازم چوبی",
+                "وسایل شخصی", "پوشاک و کیف و کفش"
+        );    }
 
     // مدیریت کلیک دکمه جست‌وجو و اعمال فیلترها
     @FXML
@@ -111,13 +116,18 @@ public class MainController {
 
     private void showAdDetails(AdResponse ad) {
         this.selectedAd = ad;
-        titleLabel.setText(ad.getTitle());
+        titleLabel.setText(ad.getTitle() != null ? ad.getTitle() : "-");
         priceLabel.setText(String.format("%,.0f تومان", ad.getPrice()));
-        cityLabel.setText(ad.getCity());
+        cityLabel.setText(ad.getCity() != null ? ad.getCity() : "-");
         categoryLabel.setText(ad.getCategory());
         ownerLabel.setText(ad.getOwnerUsername());
-        descriptionArea.setText(ad.getDescription());
-        imageLabel.setText(ad.getImageUrlsList().stream().collect(Collectors.joining(" ,")));
+        descriptionArea.setText(ad.getDescription() != null ? ad.getDescription() : "");
+
+        if (ad.getImageUrlsList() != null && !ad.getImageUrlsList().isEmpty()) {
+            imageLabel.setText(String.join(" ,", ad.getImageUrlsList()));
+        } else {
+            imageLabel.setText("بدون تصویر");
+        }
     }
 
     // قرار دادن این منطق در زمان کلیک بر روی لیست آگهی‌ها در MainController

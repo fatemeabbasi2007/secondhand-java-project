@@ -140,7 +140,7 @@ public class AdvertisementService {
         return true;
     }
 
-    public List<Advertisement> searchAndFilterActiveAds(String keyword, String categoryId, String city, Double minPrice, Double maxPrice) {
+    public List<AdSearchDTO> searchAndFilterActiveAds(String keyword, String categoryId, String city, Double minPrice, Double maxPrice) {
         return advertisementRepository.findAll().stream()
                 .filter(ad -> ad.getStatus() == AdStatus.ACTIVE)
                 .filter(ad -> keyword == null || keyword.trim().isEmpty() ||
@@ -149,9 +149,13 @@ public class AdvertisementService {
                 .filter(ad -> city == null || city.trim().isEmpty() || ad.getCity() != null && ad.getCity().equals(city))
                 .filter(ad -> minPrice == null || ad.getPrice() >= minPrice)
                 .filter(ad -> maxPrice == null || ad.getPrice() <= maxPrice)
+                .map(ad -> {
+                    String username = userRepository.findByID(ad.getOwnerId())
+                            .map(User::getUsername)
+                            .orElse("ناشناس");
+                    return new AdSearchDTO(ad, username);
+                })
                 .collect(Collectors.toList());
-
-
     }
 
     public AdvertisementDetailDTO getActiveAdvertisementDetail(String advertisementId, String userId) {
@@ -181,7 +185,7 @@ public class AdvertisementService {
 
 
 
-        AdvertisementDetailDTO dto = new AdvertisementDetailDTO();
+        AdvertisementDetailDTO dto = new AdvertisementDetailDTO(advertisement , user.getUsername() , seller.getAverageRating());
         dto.setId(advertisement.getId());
         dto.setTitle(advertisement.getTitle());
         dto.setDescription(advertisement.getDescription());
@@ -191,8 +195,8 @@ public class AdvertisementService {
         dto.setImageUrls(advertisement.getImageUrls()); // اضافه شد
         dto.setCreatedAt(advertisement.getCreatedAt()); // اضافه شد
         dto.setOwnerId(seller.getId());
-        dto.setOwnerName(seller.getUsername()); // یا seller.getName()
-        dto.setOwnerAverageRating(seller.getAverageRating());
+        dto.setOwnerUsername(seller.getUsername()); // یا seller.getName()
+        dto.setSellerRating(seller.getAverageRating());
         dto.setOwner(isOwner);
         dto.setSpecificAttributes(enrichedAttributes);
         return dto;
