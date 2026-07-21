@@ -51,6 +51,7 @@
         <Label style="-fx-font-weight: bold;" text="شهر:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
         <Label fx:id="cityLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
+        <!--add field for photos-->
         <!-- سطر 4: تصویر / آدرس عکس -->
         <Label style="-fx-font-weight: bold;" text="آدرس تصویر:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
         <Label fx:id="imageLabel" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
