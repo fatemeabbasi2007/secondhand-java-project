@@ -3,6 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import javafx.scene.image.ImageView?>
 <VBox alignment="CENTER" spacing="15.0"
       xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
@@ -20,7 +21,18 @@
         <ComboBox fx:id="categoryComboBox" promptText="انتخاب کنید..." prefWidth="300.0"
                   style="-fx-background-color: #F1F2F6; -fx-background-radius: 5;"/>
     </VBox>
-    <TextField fx:id="imageUrlsField" promptText="آدرس عکس *"/>
+    <!--<TextField fx:id="imageUrlsField" promptText="آدرس عکس *"/>-->
+    <!-- دکمه انتخاب عکس و پیش‌نمایش -->
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Button text="📁 انتخاب عکس از کامپیوتر" onAction="#onSelectImageClick" style="-fx-background-color: #2196F3; -fx-text-fill: white;" />
+        <Label fx:id="imageStatusLabel" text="هیچ عکسی انتخاب نشده" style="-fx-text-fill: #757575;" />
+    </HBox>
+
+    <!-- نمایش تصویر انتخاب شده -->
+    <ImageView fx:id="previewImageView" fitHeight="150" fitWidth="150" preserveRatio="true" />
+
+    <!-- فیلد متنی مخفی یا عادی برای ذخیره رشته Base64 -->
+    <TextField fx:id="imageUrlsField" promptText="آدرس تصویر یا Base64" visible="false" />
 
     <HBox alignment="CENTER" spacing="20.0" style="-fx-padding: 10 0 0 0;">
         <Button fx:id="submitButton" text="ثبت آگهی" onAction="#onSubmitAdClick" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px; -fx-pref-width: 120;"/>

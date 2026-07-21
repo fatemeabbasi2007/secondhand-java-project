@@ -1,5 +1,7 @@
 package org.example.frontend.controller;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import org.example.frontend.model.AdDetailsResponse;
 import org.example.frontend.service.PublicAdService;
 import org.example.frontend.security.SessionManager;
@@ -24,6 +26,7 @@ public class AdDetailsController {
     @FXML private Label imageLabel;
     @FXML private HBox buyerActionsBox;
     @FXML private HBox ownerActionsBox;
+    @FXML private ImageView adImageView;
 
     private final PublicAdService adService = new PublicAdService();
     private String currentAdId;
@@ -98,6 +101,14 @@ public class AdDetailsController {
                 } else {
                     imageLabel.setText("بدون تصویر");
                 }
+            }
+
+            // for pictures
+            if (ad.getImageUrlsList() != null && !ad.getImageUrlsList().isEmpty()) {
+                String imageSource = ad.getImageUrlsList().get(0);
+                // ساخت Image از روی رشته Base64 یا URL عادی
+                Image image = new Image(imageSource);
+                adImageView.setImage(image);
             }
 
             // ۱۰. مقایسه مالکیت آگهی با کاربر فعلی جهت نمایش دکمه‌های مناسب

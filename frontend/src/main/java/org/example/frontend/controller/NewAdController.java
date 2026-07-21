@@ -5,6 +5,12 @@ import org.example.frontend.service.AdvertisementService;
 import javafx.fxml.FXML;
 import javafx.event.ActionEvent;
 import org.example.frontend.util.NavigationService;
+import javafx.stage.FileChooser;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import java.io.File;
+import java.nio.file.Files;
+import java.util.Base64;
 
 public class NewAdController {
 
@@ -15,6 +21,10 @@ public class NewAdController {
     @FXML private TextField cityField;
     @FXML private ComboBox<String> categoryComboBox;
     @FXML private TextField imageUrlsField;
+    // change format for picture
+    @FXML private ImageView previewImageView;
+    @FXML private Label imageStatusLabel;
+
 
     private final AdvertisementService adService = new AdvertisementService();
 
@@ -36,6 +46,8 @@ public class NewAdController {
         categoryComboBox.setValue(category);
         descriptionField.setText(description);
         imageUrlsField.setText(text);
+
+        categoryComboBox.setDisable(true);
     }
 
     @FXML
@@ -114,6 +126,56 @@ public class NewAdController {
         }
     }
 
+
+
+
+    // ۲. اکشن دکمه انتخاب عکس
+    @FXML
+    public void onSelectImageClick(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("انتخاب تصویر آگهی");
+
+        // محدود کردن به فایل‌های تصویری
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.webp")
+        );
+
+        javafx.stage.Stage stage = (javafx.stage.Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
+        File selectedFile = fileChooser.showOpenDialog(stage);
+
+        if (selectedFile != null) {
+            try {
+                // تبدیل عکس به رشته Base64
+                String base64Image = convertFileToBase64(selectedFile);
+
+                // قرار دادن رشته متنی در فیلد متنی جهت ارسال به بک‌اند
+                imageUrlsField.setText(base64Image);
+
+                // نمایش پیش‌نمایش در UI
+                Image image = new Image(selectedFile.toURI().toString());
+                previewImageView.setImage(image);
+
+                if (imageStatusLabel != null) {
+                    imageStatusLabel.setText("تصویر انتخاب شد: " + selectedFile.getName());
+                }
+
+            } catch (Exception e) {
+                showAlert(Alert.AlertType.ERROR, "خطا در بارگذاری عکس", "تبدیل فایل عکس با خطا مواجه شد.");
+            }
+        }
+    }
+
+    // ۳. متد تبدیل فایل به Base64 Data URL
+    private String convertFileToBase64(File file) throws Exception {
+        byte[] fileContent = Files.readAllBytes(file.toPath());
+        String base64String = Base64.getEncoder().encodeToString(fileContent);
+
+        String mimeType = Files.probeContentType(file.toPath());
+        if (mimeType == null) mimeType = "image/png";
+
+        return "data:" + mimeType + ";base64," + base64String;
+    }
+
     @FXML
     public void onCancelClick(ActionEvent event) {
         System.out.println("بازگشت به صفحه اصلی...");
@@ -134,6 +196,7 @@ public class NewAdController {
         priceField.clear();
         cityField.clear();
         categoryComboBox.setValue(null);
+        categoryComboBox.setDisable(false);
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {
