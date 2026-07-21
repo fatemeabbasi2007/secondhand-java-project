@@ -59,13 +59,15 @@
         <!-- سطر 2: دسته‌بندی -->
         <Label style="-fx-font-weight: bold;" text="دسته‌بندی:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
         <Label fx:id="categoryLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-        <VBox fx:id="customAttributesBox" spacing="8" />
+
 
         <!-- سطر 3: شهر -->
         <Label style="-fx-font-weight: bold;" text="شهر:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
         <Label fx:id="cityLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3" />
     </GridPane>
 
+    <VBox fx:id="customAttributesBox" spacing="8" />
+    
     <Separator />
 
     <!-- بخش توضیحات -->
