@@ -12,8 +12,9 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="550.0" prefWidth="500.0" spacing="15.0" style="-fx-padding: 25;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.frontend.controller.AdDetailsController">
+<VBox prefHeight="600.0" prefWidth="500.0" spacing="15.0" style="-fx-padding: 25;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.frontend.controller.AdDetailsController">
 
+    <!-- هدر بالای صفحه -->
     <HBox alignment="CENTER_LEFT" spacing="10">
         <Button onAction="#onBackClick" style="-fx-background-color: #757575; -fx-text-fill: white;" text="← بازگشت" />
         <Region HBox.hgrow="ALWAYS" />
@@ -24,37 +25,46 @@
 
     <Separator />
 
-        <Label style="-fx-font-weight: bold;" text="فروشنده:" />
-
-    <GridPane hgap="10" vgap="12">
+    <!-- جدول منظم برای مشخصات آگهی -->
+    <GridPane hgap="15" vgap="12">
         <columnConstraints>
             <ColumnConstraints percentWidth="30.0" />
-            <ColumnConstraints percentWidth="30.0" />
-         <ColumnConstraints percentWidth="70.0" />
+            <ColumnConstraints percentWidth="70.0" />
         </columnConstraints>
 
-        <Label style="-fx-font-weight: bold;" text="قیمت:" />
-        <Label fx:id="priceLabel" text="-" />
-        <Label fx:id="cityLabel" text="-" />
-        <Label fx:id="imageLabel" text="-" />
-        <Label fx:id="categoryLabel" text="-" />
-        <HBox alignment="CENTER_LEFT" spacing="10" GridPane.columnIndex="2" />
-      <rowConstraints>
-         <RowConstraints />
-         <RowConstraints />
-      </rowConstraints>
+        <!-- سطر 0: فروشنده -->
+        <Label style="-fx-font-weight: bold;" text="فروشنده:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+        <HBox alignment="CENTER_LEFT" spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="0">
+            <Label fx:id="ownerLabel" text="-" />
+            <Label fx:id="ratingLabel" style="-fx-text-fill: #FFA000; -fx-font-weight: bold;" text="(امتیاز: - ★)" />
+        </HBox>
+
+        <!-- سطر 1: قیمت -->
+        <Label style="-fx-font-weight: bold;" text="قیمت:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <Label fx:id="priceLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+        <!-- سطر 2: دسته‌بندی -->
+        <Label style="-fx-font-weight: bold;" text="دسته‌بندی:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+        <Label fx:id="categoryLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+        <!-- سطر 3: شهر -->
+        <Label style="-fx-font-weight: bold;" text="شهر:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+        <Label fx:id="cityLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+        <!-- سطر 4: تصویر / آدرس عکس -->
+        <Label style="-fx-font-weight: bold;" text="آدرس تصویر:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+        <Label fx:id="imageLabel" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
     </GridPane>
-
-        <Label style="-fx-font-weight: bold;" text="دسته‌بندی:" />
-
-     <Label style="-fx-font-weight: bold;" text="شهر:" />
-      <Label fx:id="ratingLabel" style="-fx-text-fill: #FFA000; -fx-font-weight: bold;" text="(امتیاز: ۴.۵ ★)" />
-
-    <Label style="-fx-font-weight: bold;" text="توضیحات:" />
-    <TextArea fx:id="descriptionArea" editable="false" prefHeight="150.0" wrapText="true" VBox.vgrow="ALWAYS" />
 
     <Separator />
 
+    <!-- بخش توضیحات -->
+    <Label style="-fx-font-weight: bold;" text="توضیحات:" />
+    <TextArea fx:id="descriptionArea" editable="false" prefHeight="120.0" wrapText="true" VBox.vgrow="ALWAYS" />
+
+    <Separator />
+
+    <!-- دکمه‌های عملیات -->
     <StackPane>
         <HBox fx:id="buyerActionsBox" alignment="CENTER" spacing="15" visible="false">
             <Button onAction="#onRateSellerClick" style="-fx-background-color: #FFA000; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-width: 140;" text="امتیازدهی به فروشنده" />
