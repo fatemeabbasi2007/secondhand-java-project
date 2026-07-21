@@ -1,23 +1,22 @@
 package org.example.frontend.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class RateSellerRequest {
-    private String advertisementId;
-    private int rating; // عدد بین 1 تا 5
-    private String comment; // نظر متنی اختیاری
+
+    @JsonProperty("score") // نگاشت دقیق با فیلد score در DTO بک‌اند
+    private int score;
+    private String comment;
 
     public RateSellerRequest() {}
 
-    public RateSellerRequest(String advertisementId, int rating, String comment) {
-        this.advertisementId = advertisementId;
-        this.rating = rating;
+    public RateSellerRequest(int score, String comment) {
+        this.score = score;
         this.comment = comment;
     }
 
-    public String getAdvertisementId() { return advertisementId; }
-    public void setAdvertisementId(String advertisementId) { this.advertisementId = advertisementId; }
-
-    public int getRating() { return rating; }
-    public void setRating(int rating) { this.rating = rating; }
+    public int getScore() { return score; }
+    public void setScore(int score) { this.score = score; }
 
     public String getComment() { return comment; }
     public void setComment(String comment) { this.comment = comment; }
