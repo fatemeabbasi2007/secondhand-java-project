@@ -8,7 +8,7 @@ public class AdDetailsResponse {
     private String description;
     private double price;
     private String city;
-    private String category;
+    private String categoryId;
     private Long ownerId;
     private String ownerUsername;
     private double ownerAverageRating; // میانگین امتیاز فروشنده (مرحله ۵)
@@ -24,7 +24,7 @@ public class AdDetailsResponse {
         this.description = description;
         this.price = price;
         this.city = city;
-        this.category = category;
+        this.categoryId = category;
         this.ownerId = ownerId;
         this.ownerUsername = ownerUsername;
         this.ownerAverageRating = ownerAverageRating;
@@ -47,8 +47,8 @@ public class AdDetailsResponse {
     public String getCity() { return city; }
     public void setCity(String city) { this.city = city; }
 
-    public String getCategory() { return category; }
-    public void setCategory(String category) { this.category = category; }
+    public String getCategory() { return toCategoryId(categoryId); }
+    public void setCategory(String category) { this.categoryId = category; }
 
     public Long getOwnerId() { return ownerId; }
     public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }
@@ -64,4 +64,43 @@ public class AdDetailsResponse {
 
     public List<String> getImageUrlsList() {return imageUrlsList;}
     public void setImageUrlsList(List<String> imageUrlsList) {this.imageUrlsList = imageUrlsList;}
+
+    private String toCategoryId (String category) {
+        switch (category.trim()) {
+
+            case "VEHICLES":
+                return "وسایل نقلیه";
+            case "CARS":
+                return "خودرو";
+            case "MOTORCYCLES":
+                return "موتورسیکلت";
+
+            case "REAL_ESTATE":
+                return "املاک";
+            case "APARTMENTS":
+                return "آپارتمان و مسکونی";
+            case "COMMERCIAL":
+                return "اداری و تجاری";
+
+            case "ELECTRONICS":
+                return "لوازم الکترونیکی";
+            case "MOBILE_PHONES":
+                return "موبایل و تبلت";
+            case "LAPTOPS":
+                return "لپ‌تاپ و کامپیوتر";
+
+            case "HOME_GOODS":
+                return "وسایل خانه و آشپزخانه";
+            case "FURNITURE":
+                return "مبلمان و لوازم چوبی";
+
+            case "PERSONAL_ITEMS":
+                return "وسایل شخصی";
+            case "CLOTHING":
+                return "پوشاک و کیف و کفش";
+
+            default:
+                return "";
+        }
+    }
 }
