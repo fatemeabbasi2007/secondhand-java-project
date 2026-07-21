@@ -18,25 +18,25 @@ public class RatingService {
     private final ObjectMapper objectMapper;
 
     public RatingService() {
-        // ۱. استفاده از ApiClient مشترک به جای ساخت HttpClient جدید
         this.client = ApiClient.getClient();
         this.objectMapper = new ObjectMapper();
     }
 
-    // ارسال امتیاز به بک‌اند
     public void rateSeller(String adId, int rating, String comment) throws Exception {
-        // ۲. تغییر بررسی لاگین بر اساس userId
         String userId = SessionManager.getInstance().getUserId();
         if (userId == null) {
             throw new Exception("برای ثبت امتیاز ابتدا باید وارد حساب کاربری خود شوید.");
         }
 
-        RateSellerRequest rateRequest = new RateSellerRequest(adId, rating, comment);
+        // ارسال score به جای rating جهت انطباق با ReviewDTO در بک‌اند
+        RateSellerRequest rateRequest = new RateSellerRequest(rating, comment);
         String jsonBody = objectMapper.writeValueAsString(rateRequest);
 
-        // ۳. حذف هدر Authorization به دلیل مدیریت سشن با کوکی
+        // ارسال درخواست به آدرس دقیقی که ReviewController انتظار دارد
+        String url = ApiConfig.BASE_URL + "/api/ratings/submit/" + adId;
+
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(ApiConfig.BASE_URL + "/api/ratings"))
+                .uri(URI.create(url))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                 .build();
