@@ -28,16 +28,37 @@ public class ChatService {
 
     public Conversation startOrSendMessage(String advertisementId, String loggedInUserId, Message message) {
 
-        if ( message == null || message.getContent() == null || message.getContent().trim().isEmpty()){
+        if (message == null || message.getContent() == null || message.getContent().trim().isEmpty()) {
             throw new InvalidMessageException("متن پیام نمی‌تواند خالی باشد");
         }
+
         Advertisement ad = advertisementRepository.findByID(advertisementId)
                 .orElseThrow(() -> new AdvertisementNotFoundException("آگهی مورد نظر یافت نشد"));
+
         String sellerId = ad.getOwnerId();
-        String buyerId = loggedInUserId.equals(sellerId) ? message.getSenderId() : loggedInUserId;
-        if ( buyerId.equals(sellerId)){
-            throw new SameSellerAndBuyerIdExcpetion("کاربر نمیتواند به آگهی خودش پیام دهد");
+        String buyerId;
+
+        // اگر کاربر جاری فروشنده است
+        if (loggedInUserId.equals(sellerId)) {
+            if (message.getSenderId() != null && !message.getSenderId().isBlank()) {
+                buyerId = message.getSenderId();
+            } else {
+                // پیدا کردن چت موجود برای یافتن buyerId
+                List<Conversation> convs = conversationRepository.findConversationsByUserId(loggedInUserId);
+                buyerId = convs.stream()
+                        .filter(c -> advertisementId.equals(c.getAdvertisementId()))
+                        .map(Conversation::getBuyerId)
+                        .findFirst()
+                        .orElseThrow(() -> new InvalidMessageException("گفت‌وگویی یافت نشد. خریدار باید ابتدا پیام دهد."));
+            }
+        } else {
+            buyerId = loggedInUserId;
         }
+
+        if (buyerId.equals(sellerId)) {
+            throw new SameSellerAndBuyerIdExcpetion("کاربر نمی‌تواند به آگهی خودش پیام دهد");
+        }
+
         User sender = userRepository.findByID(loggedInUserId)
                 .orElseThrow(() -> new UserNotFoundException("حساب شما یافت نشد"));
         User receiver = userRepository.findByID(loggedInUserId.equals(buyerId) ? sellerId : buyerId)
@@ -46,10 +67,11 @@ public class ChatService {
         if (!sender.isEnabled() || !receiver.isEnabled()) {
             throw new UserBannedException("یکی از طرفین مسدود است و امکان ارسال پیام وجود ندارد");
         }
+
         String conversationId = buyerId + "_" + advertisementId;
         Conversation conversation = conversationRepository.findByID(conversationId).orElseGet(() -> {
             if (loggedInUserId.equals(sellerId)) {
-                throw new InvalidMessageException("گفت‌وگویی یافت نشد. خریدار باید ابتدا پیام بدهد.");
+                throw new InvalidMessageException("گفت‌وگویی یافت نشد. خریدار باید ابتدا پیام دهد.");
             }
             Conversation newConv = new Conversation();
             newConv.setId(conversationId);
@@ -58,8 +80,9 @@ public class ChatService {
             newConv.setSellerId(sellerId);
             return newConv;
         });
+
         message.setSenderId(loggedInUserId);
-        message.setSentAt(LocalDateTime.now()); // زمان دقیق سرور
+        message.setSentAt(LocalDateTime.now());
 
         conversation.addMessageToList(message);
         conversation.setLastMessageAt(message.getSentAt());

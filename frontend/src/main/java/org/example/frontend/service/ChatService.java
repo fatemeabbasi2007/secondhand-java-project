@@ -24,6 +24,7 @@ public class ChatService {
         // ۱. استفاده از کلاینت مشترک همراه با کوکی سشن
         this.client = ApiClient.getClient();
         this.objectMapper = new ObjectMapper();
+        this.objectMapper.findAndRegisterModules(); // 👈 افزودن پشتیبانی از LocalDateTime
     }
 
     // ۲. ارسال درخواست شروع گفت‌وگو با adId از نوع String
