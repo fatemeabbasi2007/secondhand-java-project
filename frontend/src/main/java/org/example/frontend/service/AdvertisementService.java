@@ -23,50 +23,35 @@ public class AdvertisementService {
     }
 
     public void createAdvertisement(String title, String description, double price, String city, String category, List<String> imageUrls, String attributesJson) throws Exception {
-        // دریافت توکن کاربر از سشن
         String userId = SessionManager.getInstance().getUserId();
         if (userId == null) {
             throw new Exception("شما وارد حساب کاربری خود نشده‌اید.");
         }
 
-        // ۱. ساخت بخش آدرس متنی به همراه کوری‌پارامترهای عکس
-        // ساختار آدرس به این شکل می‌شود: /api/advertisements/create?imageUrls=url1&imageUrls=url2
-        StringBuilder urlBuilder = new StringBuilder(ApiConfig.BASE_URL + "/api/advertisements/create");
+        // ۱. آدرس ساده بدون پارامترهای اضافی در URL
+        String url = ApiConfig.BASE_URL + "/api/advertisements/create";
 
-        if (imageUrls != null && !imageUrls.isEmpty()) {
-            urlBuilder.append("?");
-            for (int i = 0; i < imageUrls.size(); i++) {
-                urlBuilder.append("imageUrls=").append(java.net.URLEncoder.encode(imageUrls.get(i), "UTF-8"));
-                if (i < imageUrls.size() - 1) {
-                    urlBuilder.append("&");
-                }
-            }
-        }
-
-        // ۲. آماده‌سازی بدنه جی‌سان فقط برای اطلاعات متنی آگهی
+        // ۲. ساخت درخواست JSON و تزریق لیست عکس‌ها درون بدنه
         AdvertisementRequest adRequest = new AdvertisementRequest(title, description, price, city, toCategoryId(category), attributesJson);
+        adRequest.setImageUrlsList(imageUrls); // 👈 عکس‌ها داخل بدنه قرار می‌گیرند
+
         String jsonBody = objectMapper.writeValueAsString(adRequest);
 
-        // ۳. ساخت درخواست HTTP POST (بدون توکن و هدر احراز هویت)
+        // ۳. ارسال درخواست POST
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(urlBuilder.toString()))
+                .uri(URI.create(url))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-
-        // اگر کد وضعیت 201 (ساخته شد) یا 200 نبود، خطای سرور را پردازش می‌کنیم
         if (response.statusCode() != 201 && response.statusCode() != 200) {
             try {
                 ErrorResponse error = objectMapper.readValue(response.body(), ErrorResponse.class);
                 throw new Exception(error.getMessage());
             } catch (Exception exception) {
-                if (response.body() != null && !response.body().isBlank()) {
-                    throw new Exception(response.body());
-                }
-                throw new Exception("خطا در ثبت آگهی. کد وضعیت: " + response.statusCode());
+                throw new Exception("خطا در ثبت آگهی (کد " + response.statusCode() + "): " + response.body());
             }
         }
     }
