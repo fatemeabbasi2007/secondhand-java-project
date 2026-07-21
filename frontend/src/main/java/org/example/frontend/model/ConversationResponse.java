@@ -4,32 +4,25 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.time.LocalDateTime;
-
-@JsonIgnoreProperties(ignoreUnknown = true) // جلوگیری از کرش در صورت وجود فیلدهای ناشناخته
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ConversationResponse {
+
     private String conversationId;
     private String advertisementId;
+
+    @JsonProperty("title") // نگاشت صحیح کلید title بک‌اند
     private String title;
 
-    @JsonProperty("otherPartyUsername")
+    @JsonProperty("otherPartyName")
     @JsonAlias({"otherPartyName", "otherPartyUsername"})
     private String otherPartyUsername;
-    private String lastMessagePreview;
-    private LocalDateTime lastMessageAt;
 
+    private String lastMessagePreview;
+
+    @JsonProperty("lastMessageAt")
+    private String lastMessageAt;
 
     public ConversationResponse() {}
-
-    public ConversationResponse(String conversationId, String advertisementId, String advertisementTitle,
-                                String otherPartyUsername, String lastMessage, LocalDateTime lastMessageTime) {
-        this.conversationId = conversationId;
-        this.advertisementId = advertisementId;
-        this.title = advertisementTitle;
-        this.otherPartyUsername = otherPartyUsername;
-        this.lastMessagePreview = lastMessage;
-        this.lastMessageAt = lastMessageTime;
-    }
 
     public String getConversationId() { return conversationId; }
     public void setConversationId(String conversationId) { this.conversationId = conversationId; }
@@ -38,7 +31,7 @@ public class ConversationResponse {
     public void setAdvertisementId(String advertisementId) { this.advertisementId = advertisementId; }
 
     public String getAdvertisementTitle() { return title; }
-    public void setAdvertisementTitle(String advertisementTitle) { this.title = advertisementTitle; }
+    public void setAdvertisementTitle(String title) { this.title = title; }
 
     public String getOtherPartyUsername() { return otherPartyUsername; }
     public void setOtherPartyUsername(String otherPartyUsername) { this.otherPartyUsername = otherPartyUsername; }
@@ -46,6 +39,6 @@ public class ConversationResponse {
     public String getLastMessagePreview() { return lastMessagePreview; }
     public void setLastMessagePreview(String lastMessagePreview) { this.lastMessagePreview = lastMessagePreview; }
 
-    public LocalDateTime getLastMessageTime() { return lastMessageAt; }
-    public void setLastMessageTime(LocalDateTime lastMessageTime) { this.lastMessageAt = lastMessageTime; }
+    public String getLastMessageTime() { return lastMessageAt; }
+    public void setLastMessageTime(String lastMessageAt) { this.lastMessageAt = lastMessageAt; }
 }

@@ -39,14 +39,27 @@ public class ChatController {
                 if (empty || item == null) {
                     setText(null);
                 } else {
+                    String adTitle = item.getAdvertisementTitle() != null ? item.getAdvertisementTitle() : "بدون عنوان";
+                    String otherUser = item.getOtherPartyUsername() != null ? item.getOtherPartyUsername() : "کاربر";
+
                     String lastMsg = item.getLastMessagePreview() != null ? item.getLastMessagePreview() : "پیامی ارسال نشده";
                     if (lastMsg.length() > 25) lastMsg = lastMsg.substring(0, 22) + "...";
 
+                    // فرمت‌دهی زمان آخرین پیام
+                    String rawTime = item.getLastMessageTime();
+                    String timeFormatted = "-";
+                    if (rawTime != null && !rawTime.isBlank()) {
+                        timeFormatted = rawTime.replace("T", " ");
+                        if (timeFormatted.length() > 16) {
+                            timeFormatted = timeFormatted.substring(0, 16);
+                        }
+                    }
+
                     setText(String.format("آگهی: %s\nطرف مقابل: %s\nآخرین پیام: %s (%s)",
-                            item.getAdvertisementTitle(),
-                            item.getOtherPartyUsername(),
+                            adTitle,
+                            otherUser,
                             lastMsg,
-                            item.getLastMessageTime() != null ? item.getLastMessageTime() : "-"));
+                            timeFormatted));
                 }
             }
         });
@@ -60,25 +73,49 @@ public class ChatController {
                     setText(null);
                     setStyle("");
                 } else {
+                    String currentUserId = SessionManager.getInstance().getUserId();
                     String currentUsername = SessionManager.getInstance().getUsername();
-                    if (item.getSenderId().equalsIgnoreCase(currentUsername)) {
-                        // پیام خود کاربر (چینش یا رنگ متفاوت)
-                        setText("[شما]: " + item.getContent() + " \n(" + item.getSendAt() + ")");
+
+                    // فرمت‌دهی زمان پیام
+                    String rawTime = item.getSendAt();
+                    String timeStr = "";
+                    if (rawTime != null && !rawTime.isBlank()) {
+                        timeStr = rawTime.replace("T", " ");
+                        if (timeStr.length() > 16) {
+                            timeStr = timeStr.substring(0, 16);
+                        }
+                    }
+
+                    // بررسی هوشمند اینکه آیا پیام متعلق به کاربر جاری است یا خیر
+                    boolean isMyMessage = item.getSenderId() != null && (
+                            item.getSenderId().equalsIgnoreCase(currentUserId) ||
+                                    item.getSenderId().equalsIgnoreCase(currentUsername)
+                    );
+
+                    if (isMyMessage) {
+                        // پیام خود کاربر
+                        setText("[شما]: " + item.getContent() + (timeStr.isEmpty() ? "" : " \n(" + timeStr + ")"));
                         setStyle("-fx-text-fill: #1565C0; -fx-padding: 5;");
                     } else {
                         // پیام طرف مقابل
-                        setText("[" + item.getSenderId() + "]: " + item.getContent() + " \n(" + item.getSendAt() + ")");
+                        String otherName = (selectedConversation != null && selectedConversation.getOtherPartyUsername() != null)
+                                ? selectedConversation.getOtherPartyUsername()
+                                : "طرف مقابل";
+                        setText("[" + otherName + "]: " + item.getContent() + (timeStr.isEmpty() ? "" : " \n(" + timeStr + ")"));
                         setStyle("-fx-text-fill: #37474F; -fx-padding: 5;");
                     }
                 }
             }
         });
 
-        // شنونده انتخاب گفت‌وگو
+        // ۳. شنونده انتخاب گفت‌وگو
         conversationsListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 selectedConversation = newVal;
-                activeChatTitleLabel.setText("گفت‌وگو با: " + newVal.getOtherPartyUsername() + " در رابطه با آگهی " + newVal.getAdvertisementTitle());
+                String adTitle = newVal.getAdvertisementTitle() != null ? newVal.getAdvertisementTitle() : "آگهی";
+                String otherUser = newVal.getOtherPartyUsername() != null ? newVal.getOtherPartyUsername() : "کاربر";
+
+                activeChatTitleLabel.setText("گفت‌وگو با: " + otherUser + " در رابطه با آگهی " + adTitle);
                 loadMessages(newVal.getConversationId());
             }
         });

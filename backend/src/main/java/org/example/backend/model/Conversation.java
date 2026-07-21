@@ -28,7 +28,10 @@ public class Conversation {
 
     private LocalDateTime lastMessageAt = LocalDateTime.now();
     private String lastMessagePreview = "";
-    public void addMessageToList(Message m){
+    public void addMessageToList(Message m) {
+        if (this.messages == null) {
+            this.messages = new ArrayList<>();
+        }
         messages.add(m);
     }
 
