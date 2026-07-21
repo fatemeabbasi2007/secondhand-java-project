@@ -22,7 +22,7 @@ public class AdvertisementService {
         this.objectMapper = new ObjectMapper();
     }
 
-    public void createAdvertisement(String title, String description, double price, String city, String category, List<String> imageUrls) throws Exception {
+    public void createAdvertisement(String title, String description, double price, String city, String category, List<String> imageUrls, String attributesJson) throws Exception {
         // دریافت توکن کاربر از سشن
         String userId = SessionManager.getInstance().getUserId();
         if (userId == null) {
@@ -44,7 +44,7 @@ public class AdvertisementService {
         }
 
         // ۲. آماده‌سازی بدنه جی‌سان فقط برای اطلاعات متنی آگهی
-        AdvertisementRequest adRequest = new AdvertisementRequest(title, description, price, city, toCategoryId(category));
+        AdvertisementRequest adRequest = new AdvertisementRequest(title, description, price, city, toCategoryId(category), attributesJson);
         String jsonBody = objectMapper.writeValueAsString(adRequest);
 
         // ۳. ساخت درخواست HTTP POST (بدون توکن و هدر احراز هویت)
@@ -72,7 +72,7 @@ public class AdvertisementService {
     }
 
     // ارسال درخواست ویرایش آگهی به بک‌اند با متد PUT
-    public void updateAdvertisement(String adId, String title, String description, double price, String city, String category, List<String> imageUrls) throws Exception {
+    public void updateAdvertisement(String adId, String title, String description, double price, String city, String category, List<String> imageUrls, String attributesJson) throws Exception {
         //  بررسی لاگین بودن کاربر از روی سشن
         String userId = SessionManager.getInstance().getUserId();
         if (userId == null) {
@@ -80,7 +80,7 @@ public class AdvertisementService {
         }
 
         //  ساخت شیء درخواست به همراه آیدی آگهی
-        AdvertisementRequest adRequest = new AdvertisementRequest(adId, title, description, price, city, toCategoryId(category), imageUrls);
+        AdvertisementRequest adRequest = new AdvertisementRequest(adId, title, description, price, city, toCategoryId(category), imageUrls, attributesJson);
         String jsonBody = objectMapper.writeValueAsString(adRequest);
 
         // ۳. ارسال درخواست PUT کاملاً سشن‌محور و بدون توکن هدر
