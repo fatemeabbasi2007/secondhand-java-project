@@ -20,6 +20,7 @@ public class AdvertisementDetailDTO {
     private String categoryName; // ارسال نام دسته بندی علاوه بر ID کار فرانت را راحت می‌کند
     private List<String> imageUrls;
     private LocalDateTime createdAt;
+    private List<AttributeRule> categoryRules;
 
 
 

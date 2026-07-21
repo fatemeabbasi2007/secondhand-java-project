@@ -34,16 +34,16 @@ public class JsonFileStorage {
             throw new RuntimeException("Failed to write data to file : " + fileName);
         }
     }
-    public <T> List<T> readFromFile(String fileName , Class<T> valueType){
+    public <T> List<T> readFromFile(String fileName, Class<T> valueType) {
         File file = new File(STORAGE_DIRECTORY + fileName);
-        if ( !file.exists() ){
+        if (!file.exists()) {
             return new ArrayList<>();
         }
         try {
-            return objectMapper.readValue(file ,objectMapper.getTypeFactory().constructCollectionType(List.class, valueType));
-
-        }catch (IOException e){
-            throw new RuntimeException("Failed to read data from file: " + fileName);
+            return objectMapper.readValue(file, objectMapper.getTypeFactory().constructCollectionType(List.class, valueType));
+        } catch (IOException e) {
+            // 👈 حتماً e را به عنوان cause پاس دهید تا خطای دقیق جکسون را در ترمینال ببینید
+            throw new RuntimeException("Failed to read data from file: " + fileName + " | Reason: " + e.getMessage(), e);
         }
     }
 }

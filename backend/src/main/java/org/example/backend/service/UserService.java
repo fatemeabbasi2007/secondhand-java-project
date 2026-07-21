@@ -32,7 +32,14 @@ public class UserService {
         }
         String phoneNum = newUser.getPhoneNum();
         if ( phoneNum == null || phoneNum.length() != 11 || !phoneNum.startsWith("09")){
-            throw new InvalidPhoneNumException("شماره تلفن وارد شده معتبر نیست (باید ۱۱ رقم و با ۰۹ آغاز شود).");        }
+            throw new InvalidPhoneNumException("شماره تلفن وارد شده معتبر نیست (باید ۱۱ رقم و با ۰۹ آغاز شود).");
+        }
+        String email = newUser.getEmail();
+        String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+
+        if (email == null || !email.trim().matches(emailRegex)) {
+            throw new IllegalArgumentException("فرمت ایمیل وارد شده معتبر نیست.");
+        }
 
         List<User> users = userRepository.findAll();
         for ( User user : users ){

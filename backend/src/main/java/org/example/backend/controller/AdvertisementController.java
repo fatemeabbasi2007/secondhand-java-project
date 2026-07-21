@@ -39,16 +39,7 @@ public class AdvertisementController {
             return ResponseEntity.ok(chosenAds);
 
     }
-    @GetMapping("/categories/{categoryId}/attributes")
-    public ResponseEntity<?> getAttributesForCategory(@PathVariable String categoryId) {
-        try {
-            List<AttributeRule> rules = advertisementService.getRulesForCategory(categoryId);
-            return ResponseEntity.ok(rules);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ErrorResponse("خطا در دریافت قوانین ویژگی‌ها"));
-        }
-    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getAdDetail(@PathVariable String id , HttpSession session) {

@@ -229,6 +229,8 @@ public class AdvertisementService {
         dto.setSellerRating(seller.getAverageRating());
         dto.setOwner(isOwner);
         dto.setSpecificAttributes(enrichedAttributes);
+        // در متد getActiveAdvertisementDetail داخل AdvertisementService:
+        dto.setCategoryRules(rules); // 👈 ارسال لیست قوانین همراه با جزئیات آگهی
         return dto;
 
 
