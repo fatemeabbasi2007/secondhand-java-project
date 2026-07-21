@@ -1,24 +1,44 @@
 package org.example.frontend.model;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true) // جلوگیری از کرش در صورت وجود فیلدهای اضافی
 public class AdDetailsResponse {
+
     private String id;
     private String title;
     private String description;
     private double price;
+
+    @JsonAlias({"cityName", "city"})
     private String city;
     private String categoryId;
     private Long ownerId;
+
+    @JsonAlias({"categoryId", "categoryName", "category"})
+    private String category;
+
+    // اصلاح نوع داده به String برای همخوانی با بک‌اند
+    private String ownerId;
+
+    @JsonAlias({"ownerName", "ownerUsername"})
     private String ownerUsername;
-    private double ownerAverageRating; // میانگین امتیاز فروشنده (مرحله ۵)
-    private String status;// وضعیت آگهی (ACTIVE, SOLD, PENDING و غیره)
+
+    private double ownerAverageRating;
+    private String status;
+
+    @JsonProperty("imageUrlsList")
+    @JsonAlias({"imageUrls", "imageUrl", "imageUrlsList"})
     private List<String> imageUrlsList;
 
     public AdDetailsResponse() {}
 
     public AdDetailsResponse(String id, String title, String description, double price, String city,
-                             String category, Long ownerId, String ownerUsername, double ownerAverageRating, String status) {
+                             String category, String ownerId, String ownerUsername, double ownerAverageRating, String status) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -31,7 +51,7 @@ public class AdDetailsResponse {
         this.status = status;
     }
 
-    // متدهای Getter و Setter
+    // --- Getterها و Setterها ---
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
@@ -50,8 +70,8 @@ public class AdDetailsResponse {
     public String getCategory() { return toCategoryId(categoryId); }
     public void setCategory(String category) { this.categoryId = category; }
 
-    public Long getOwnerId() { return ownerId; }
-    public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }
+    public String getOwnerId() { return ownerId; }
+    public void setOwnerId(String ownerId) { this.ownerId = ownerId; }
 
     public String getOwnerUsername() { return ownerUsername; }
     public void setOwnerUsername(String ownerUsername) { this.ownerUsername = ownerUsername; }
@@ -103,4 +123,6 @@ public class AdDetailsResponse {
                 return "";
         }
     }
+    public List<String> getImageUrlsList() { return imageUrlsList; }
+    public void setImageUrlsList(List<String> imageUrlsList) { this.imageUrlsList = imageUrlsList; }
 }

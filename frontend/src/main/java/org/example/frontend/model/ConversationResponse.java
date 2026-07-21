@@ -1,14 +1,23 @@
 package org.example.frontend.model;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalDateTime;
 
+@JsonIgnoreProperties(ignoreUnknown = true) // جلوگیری از کرش در صورت وجود فیلدهای ناشناخته
 public class ConversationResponse {
     private String conversationId;
     private String advertisementId;
     private String title;
+
+    @JsonProperty("otherPartyUsername")
+    @JsonAlias({"otherPartyName", "otherPartyUsername"})
     private String otherPartyUsername;
     private String lastMessagePreview;
     private LocalDateTime lastMessageAt;
+
 
     public ConversationResponse() {}
 
