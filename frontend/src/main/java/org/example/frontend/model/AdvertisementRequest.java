@@ -13,6 +13,7 @@ public class AdvertisementRequest {
     private String description;
     private double price;
     private String city;
+    private String categoryId;
 
     @JsonProperty("categoryId") // موقع تبدیل به JSON حتماً کلید categoryId تولید می‌کند
     private String category;
@@ -27,6 +28,8 @@ public class AdvertisementRequest {
         this.description = description;
         this.price = price;
         this.city = city;
+        this.categoryId = category;
+
         this.category = category;
     }
 
@@ -36,7 +39,7 @@ public class AdvertisementRequest {
         this.description = description;
         this.price = price;
         this.city = city;
-        this.category = category;
+        this.categoryId = category;
         this.imageUrlsList = imageUrlsList;
     }
 
@@ -53,8 +56,8 @@ public class AdvertisementRequest {
     public String getCity() { return city; }
     public void setCity(String city) { this.city = city; }
 
-    public String getCategory() { return category; }
-    public void setCategory(String category) { this.category = category; }
+    public String getCategory() { return categoryId; }
+    public void setCategory(String category) { this.categoryId = category; }
 
     public List<String> getImageUrlsList() { return imageUrlsList; }
     public void setImageUrlsList(List<String> imageUrlsList) { this.imageUrlsList = imageUrlsList; }

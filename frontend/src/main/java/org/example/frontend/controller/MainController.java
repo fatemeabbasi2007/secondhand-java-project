@@ -12,11 +12,13 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MainController {
 
     @FXML private TextField searchField;
     @FXML private TextField categoryFilterField;
+    @FXML private ComboBox<String> categoryComboBox;
     @FXML private TextField cityFilterField;
     @FXML private TextField minPriceField;
     @FXML private TextField maxPriceField;
@@ -30,6 +32,7 @@ public class MainController {
     @FXML private Label categoryLabel;
     @FXML private Label ownerLabel;
     @FXML private TextArea descriptionArea;
+    @FXML private Label imageLabel;
 
     private final PublicAdService adService = new PublicAdService();
     private final ObservableList<AdResponse> observableList = FXCollections.observableArrayList();
@@ -73,13 +76,15 @@ public class MainController {
 
         // بارگذاری اولیه کل آگهی‌های فعال
         onSearchClick(null);
+
+        categoryComboBox.getItems().addAll("وسایل نقلیه", "خودرو", "موتور سیکلت", "املاک", "آپارتمان و مسکونی", "اداری و تجاری", "لوازم الکتریکی", "موبایل و تبلت", "لپ تاپ و کامپیوتر", "وسایل خانه و آشپزخانه", "مبلمان و لوازم چوبی", "وسایل شخصی", "پوشاک و کیف و کفش");
     }
 
     // مدیریت کلیک دکمه جست‌وجو و اعمال فیلترها
     @FXML
     public void onSearchClick(ActionEvent event) {
         String query = searchField.getText().trim();
-        String category = categoryFilterField.getText().trim();
+        String category = categoryComboBox.getValue() != null ? categoryComboBox.getValue().trim() : "";
         String city = cityFilterField.getText().trim();
         String minPriceStr = minPriceField.getText().trim();
         String maxPriceStr = maxPriceField.getText().trim();
@@ -112,6 +117,7 @@ public class MainController {
         categoryLabel.setText(ad.getCategory());
         ownerLabel.setText(ad.getOwnerUsername());
         descriptionArea.setText(ad.getDescription());
+        imageLabel.setText(ad.getImageUrlsList().stream().collect(Collectors.joining(" ,")));
     }
 
     // قرار دادن این منطق در زمان کلیک بر روی لیست آگهی‌ها در MainController
@@ -188,6 +194,7 @@ public class MainController {
         cityLabel.setText("-");
         categoryLabel.setText("-");
         ownerLabel.setText("-");
+        imageLabel.setText("-");
         descriptionArea.clear();
     }
 

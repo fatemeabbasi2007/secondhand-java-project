@@ -16,6 +16,7 @@ public class AdResponse {
 
     @JsonAlias({"cityName", "city"})
     private String city;
+    private String categoryId;
 
     @JsonAlias({"categoryId", "categoryName", "category"})
     private String category;
@@ -36,7 +37,7 @@ public class AdResponse {
         this.description = description;
         this.price = price;
         this.city = city;
-        this.category = category;
+        this.categoryId = category;
         this.ownerUsername = ownerUsername;
     }
 
@@ -56,12 +57,53 @@ public class AdResponse {
     public String getCity() { return city; }
     public void setCity(String city) { this.city = city; }
 
-    public String getCategory() { return category; }
-    public void setCategory(String category) { this.category = category; }
+    public String getCategory() { return toCategoryId(categoryId); }
+    public void setCategory(String category) { this.categoryId = category; }
 
     public String getOwnerUsername() { return ownerUsername; }
     public void setOwnerUsername(String ownerUsername) { this.ownerUsername = ownerUsername; }
 
+    public List<String> getImageUrlsList() {return imageUrlsList;}
+    public void setImageUrlsList(List<String> imageUrlsList) {this.imageUrlsList = imageUrlsList;}
+
+    private String toCategoryId (String category) {
+        switch (category.trim()) {
+
+            case "VEHICLES":
+                return "وسایل نقلیه";
+            case "CARS":
+                return "خودرو";
+            case "MOTORCYCLES":
+                return "موتورسیکلت";
+
+            case "REAL_ESTATE":
+                return "املاک";
+            case "APARTMENTS":
+                return "آپارتمان و مسکونی";
+            case "COMMERCIAL":
+                return "اداری و تجاری";
+
+            case "ELECTRONICS":
+                return "لوازم الکترونیکی";
+            case "MOBILE_PHONES":
+                return "موبایل و تبلت";
+            case "LAPTOPS":
+                return "لپ‌تاپ و کامپیوتر";
+
+            case "HOME_GOODS":
+                return "وسایل خانه و آشپزخانه";
+            case "FURNITURE":
+                return "مبلمان و لوازم چوبی";
+
+            case "PERSONAL_ITEMS":
+                return "وسایل شخصی";
+            case "CLOTHING":
+                return "پوشاک و کیف و کفش";
+
+            default:
+                return "";
+        }
+    }
     public List<String> getImageUrlsList() { return imageUrlsList; }
     public void setImageUrlsList(List<String> imageUrlsList) { this.imageUrlsList = imageUrlsList; }
 }

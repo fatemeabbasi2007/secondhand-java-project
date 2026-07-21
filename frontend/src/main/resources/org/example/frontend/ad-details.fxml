@@ -38,9 +38,7 @@
         <Label fx:id="cityLabel" text="-" />
         <Label fx:id="imageLabel" text="-" />
         <Label fx:id="categoryLabel" text="-" />
-        <HBox alignment="CENTER_LEFT" spacing="10" GridPane.columnIndex="2">
-            <Label fx:id="ownerLabel" text="-" />
-        </HBox>
+        <HBox alignment="CENTER_LEFT" spacing="10" GridPane.columnIndex="2" />
       <rowConstraints>
          <RowConstraints />
          <RowConstraints />
