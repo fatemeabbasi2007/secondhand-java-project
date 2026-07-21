@@ -27,8 +27,13 @@
     <Separator />
 
     <!-- تصویر آگهی (در صورت وجود) -->
-    <HBox alignment="CENTER">
-        <ImageView fx:id="adImageView" fitHeight="200.0" fitWidth="300.0" preserveRatio="true" />
+    <!-- بخش نمایش تصاویر به همراه دکمه‌های بعدی و قبلی -->
+    <HBox alignment="CENTER" spacing="15">
+        <Button text="◄ قبلی" onAction="#onPreviousImageClick" style="-fx-background-color: #e0e0e0; -fx-font-weight: bold;" />
+
+        <ImageView fx:id="adImageView" fitHeight="220.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="true" />
+
+        <Button text="بعدی ►" onAction="#onNextImageClick" style="-fx-background-color: #e0e0e0; -fx-font-weight: bold;" />
     </HBox>
 
     <Separator />

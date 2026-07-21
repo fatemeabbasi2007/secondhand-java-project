@@ -29,6 +29,8 @@ public class AdDetailsController {
     @FXML private ImageView adImageView;
     @FXML private javafx.scene.layout.VBox customAttributesBox;
 
+    private int currentImageIndex = 0;
+    private java.util.List<String> imageUrlsList;
     private final PublicAdService adService = new PublicAdService();
     private String currentAdId;
     private final org.example.frontend.service.ChatService chatService = new org.example.frontend.service.ChatService();
@@ -106,10 +108,14 @@ public class AdDetailsController {
 
             // for pictures
             if (ad.getImageUrlsList() != null && !ad.getImageUrlsList().isEmpty()) {
-                String imageSource = ad.getImageUrlsList().get(0);
-                // ساخت Image از روی رشته Base64 یا URL عادی
-                Image image = new Image(imageSource);
-                adImageView.setImage(image);
+//                String imageSource = ad.getImageUrlsList().get(0);
+//                // ساخت Image از روی رشته Base64 یا URL عادی
+//                Image image = new Image(imageSource);
+//                adImageView.setImage(image);
+                this.imageUrlsList = ad.getImageUrlsList();
+                this.currentImageIndex = 0;
+
+                showCurrentImage();
             }
 
             // نمایش مشخصات اختصاصی (دینامیک) آگهی
@@ -160,6 +166,31 @@ public class AdDetailsController {
         } catch (Exception e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "خطا در دریافت اطلاعات", e.getMessage());
+        }
+    }
+
+    private void showCurrentImage() {
+        if (imageUrlsList != null && !imageUrlsList.isEmpty()) {
+            String imageSource = imageUrlsList.get(currentImageIndex);
+            adImageView.setImage(new Image(imageSource));
+        } else {
+            adImageView.setImage(null);
+        }
+    }
+
+    @FXML
+    public void onNextImageClick(ActionEvent event) {
+        if (imageUrlsList != null && !imageUrlsList.isEmpty()) {
+            currentImageIndex = (currentImageIndex + 1) % imageUrlsList.size(); // رفتن به عکس بعدی (چرخشی)
+            showCurrentImage();
+        }
+    }
+
+    @FXML
+    public void onPreviousImageClick(ActionEvent event) {
+        if (imageUrlsList != null && !imageUrlsList.isEmpty()) {
+            currentImageIndex = (currentImageIndex - 1 + imageUrlsList.size()) % imageUrlsList.size(); // رفتن به عکس قبلی
+            showCurrentImage();
         }
     }
 

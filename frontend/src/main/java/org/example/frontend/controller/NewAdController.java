@@ -280,34 +280,46 @@ public class NewAdController {
     @FXML
     public void onSelectImageClick(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("انتخاب تصویر آگهی");
+        fileChooser.setTitle("انتخاب تصاویر آگهی");
 
-        // محدود کردن به فایل‌های تصویری
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.webp")
         );
 
         javafx.stage.Stage stage = (javafx.stage.Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
-        File selectedFile = fileChooser.showOpenDialog(stage);
 
-        if (selectedFile != null) {
+        // ◄ ۱. تغییر به showOpenMultipleDialog برای انتخاب چندتایی
+        java.util.List<File> selectedFiles = fileChooser.showOpenMultipleDialog(stage);
+
+        if (selectedFiles != null && !selectedFiles.isEmpty()) {
             try {
-                // تبدیل عکس به رشته Base64
-                String base64Image = convertFileToBase64(selectedFile);
+                java.util.List<String> base64List = new java.util.ArrayList<>();
 
-                // قرار دادن رشته متنی در فیلد متنی جهت ارسال به بک‌اند
-                imageUrlsField.setText(base64Image);
+                // اگر از قبل عکسی در فیلد بود، حفظش می‌کنیم
+                String currentText = imageUrlsField.getText().trim();
+                if (!currentText.isEmpty()) {
+                    base64List.add(currentText);
+                }
 
-                // نمایش پیش‌نمایش در UI
-                Image image = new Image(selectedFile.toURI().toString());
-                previewImageView.setImage(image);
+                // ۲. تبدیل همه فایل‌های انتخاب‌شده به Base64
+                for (File file : selectedFiles) {
+                    base64List.add(convertFileToBase64(file));
+                }
+
+                // ۳. چسباندن رشته‌ها به هم با علامت ویرگول (,)
+                String combinedUrls = String.join(",", base64List);
+                imageUrlsField.setText(combinedUrls);
+
+                // ۴. نمایش پیش‌نمایش اولین عکس انتخاب‌شده
+                Image firstImage = new Image(selectedFiles.get(0).toURI().toString());
+                previewImageView.setImage(firstImage);
 
                 if (imageStatusLabel != null) {
-                    imageStatusLabel.setText("تصویر انتخاب شد: " + selectedFile.getName());
+                    imageStatusLabel.setText(selectedFiles.size() + " تصویر انتخاب شد.");
                 }
 
             } catch (Exception e) {
-                showAlert(Alert.AlertType.ERROR, "خطا در بارگذاری عکس", "تبدیل فایل عکس با خطا مواجه شد.");
+                showAlert(Alert.AlertType.ERROR, "خطا در بارگذاری عکس", "تبدیل فایل‌ها با خطا مواجه شد.");
             }
         }
     }
