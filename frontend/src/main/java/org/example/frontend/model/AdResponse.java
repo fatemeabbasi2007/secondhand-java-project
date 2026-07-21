@@ -104,6 +104,6 @@ public class AdResponse {
                 return "";
         }
     }
-    public List<String> getImageUrlsList() { return imageUrlsList; }
-    public void setImageUrlsList(List<String> imageUrlsList) { this.imageUrlsList = imageUrlsList; }
+    //public List<String> getImageUrlsList() { return imageUrlsList; }
+    //public void setImageUrlsList(List<String> imageUrlsList) { this.imageUrlsList = imageUrlsList; }
 }

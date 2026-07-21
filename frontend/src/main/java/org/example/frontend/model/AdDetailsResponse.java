@@ -17,7 +17,7 @@ public class AdDetailsResponse {
     @JsonAlias({"cityName", "city"})
     private String city;
     private String categoryId;
-    private Long ownerId;
+    //private Long ownerId;
 
     @JsonAlias({"categoryId", "categoryName", "category"})
     private String category;
@@ -123,6 +123,6 @@ public class AdDetailsResponse {
                 return "";
         }
     }
-    public List<String> getImageUrlsList() { return imageUrlsList; }
-    public void setImageUrlsList(List<String> imageUrlsList) { this.imageUrlsList = imageUrlsList; }
+    //public List<String> getImageUrlsList() { return imageUrlsList; }
+    //public void setImageUrlsList(List<String> imageUrlsList) { this.imageUrlsList = imageUrlsList; }
 }
