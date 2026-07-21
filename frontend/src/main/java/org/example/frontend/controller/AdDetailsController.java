@@ -171,8 +171,28 @@ public class AdDetailsController {
 
     private void showCurrentImage() {
         if (imageUrlsList != null && !imageUrlsList.isEmpty()) {
-            String imageSource = imageUrlsList.get(currentImageIndex);
-            adImageView.setImage(new Image(imageSource));
+            try {
+                String imageSource = imageUrlsList.get(currentImageIndex);
+
+                // اگر عکس به صورت Base64 ذخیره شده است (یعنی با data:image شروع می‌شود یا خروجی فایل است)
+                if (imageSource.startsWith("data:image")) {
+                    // جدا کردن پیشوند data:image/png;base64,
+                    String base64Data = imageSource.substring(imageSource.indexOf(",") + 1);
+
+                    // تبدیل رشته به بایت‌های عکس
+                    byte[] imageBytes = java.util.Base64.getDecoder().decode(base64Data);
+
+                    // ساخت Image از روی Input Stream
+                    java.io.ByteArrayInputStream bis = new java.io.ByteArrayInputStream(imageBytes);
+                    adImageView.setImage(new Image(bis));
+                } else {
+                    // اگر URL عادی اینترنتی بود (مثل http://...)
+                    adImageView.setImage(new Image(imageSource));
+                }
+            } catch (Exception e) {
+                System.err.println("خطا در بارگذاری تصویر: " + e.getMessage());
+                adImageView.setImage(null);
+            }
         } else {
             adImageView.setImage(null);
         }
