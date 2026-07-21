@@ -1,6 +1,7 @@
 package org.example.frontend.controller;
 
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import org.example.frontend.service.AdvertisementService;
 import javafx.fxml.FXML;
 import javafx.event.ActionEvent;
@@ -20,6 +21,7 @@ public class NewAdController {
     @FXML private TextField priceField;
     @FXML private TextField cityField;
     @FXML private ComboBox<String> categoryComboBox;
+    @FXML private VBox dynamicFieldsContainer;
     @FXML private TextField imageUrlsField;
     // change format for picture
     @FXML private ImageView previewImageView;
@@ -34,10 +36,91 @@ public class NewAdController {
     @FXML
     public void initialize() {
         categoryComboBox.getItems().addAll("وسایل نقلیه", "خودرو", "موتور سیکلت", "املاک", "آپارتمان و مسکونی", "اداری و تجاری", "لوازم الکتریکی", "موبایل و تبلت", "لپ تاپ و کامپیوتر", "وسایل خانه و آشپزخانه", "مبلمان و لوازم چوبی", "وسایل شخصی", "پوشاک و کیف و کفش");
+        categoryComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            updateDynamicFields(newValue);
+        });
+    }
+
+    private TextField mileageField;   // کارکرد خودرو
+    private TextField areaField;      // متراژ ملک
+    private TextField markField; // برای وسایل برقی مثل وسایل خانه و ابزار الکترونیک
+    private TextField colorField; // برای وسایل شخصی
+
+    private void updateDynamicFields(String category) {
+        if (dynamicFieldsContainer == null) return;
+
+        // ۱. پاک کردن فیلدهای قبلی از UI
+        dynamicFieldsContainer.getChildren().clear();
+
+        // ۲. ریست کردن رفرنس‌ها
+        mileageField = null;
+        areaField = null;
+        markField = null;
+        colorField = null;
+
+        if (category == null) return;
+
+        // ۳. ساخت فیلدهای متناسب با دسته‌بندی
+        switch (category) {
+            case "خودرو":
+            case "وسایل نقلیه":
+            case "موتور سیکلت":
+                mileageField = new TextField();
+                mileageField.setPromptText("کارکرد (کیلومتر)");
+                dynamicFieldsContainer.getChildren().addAll(
+                        new Label("مشخصات وسیله نقلیه:"),
+                        mileageField
+                );
+                break;
+
+            case "آپارتمان و مسکونی":
+            case "املاک":
+            case "اداری و تجاری":
+                areaField = new TextField();
+                areaField.setPromptText("متراژ (مترمربع)");
+
+                dynamicFieldsContainer.getChildren().addAll(
+                        new Label("مشخصات ملک:"),
+                        areaField
+
+                );
+                break;
+
+            case "لوازم الکترونیکی":
+            case "موبایل و تبلت":
+            case "لپ‌تاپ و کامپیوتر":
+            case "وسایل خانه و آشپزخانه":
+            case "مبلمان و لوازم چوبی":
+                markField = new TextField();
+                markField.setPromptText("مدل و برند");
+
+                dynamicFieldsContainer.getChildren().addAll(
+                        new Label("مشخصات جنس:"),
+                        markField
+
+                );
+                break;
+
+            case "وسایل شخصی":
+            case "پوشاک و کیف و کفش":
+                colorField = new TextField();
+                colorField.setPromptText("رنگ");
+
+                dynamicFieldsContainer.getChildren().addAll(
+                        new Label("مشخصات وسایل:"),
+                        colorField
+
+                );
+                break;
+
+            default:
+                // بقیه دسته‌بندی‌ها فیلد اضافه ندارند
+                break;
+        }
     }
 
     // این متد برای پر کردن فیلدها در حالت ویرایش از طرف صفحه قبل صدا زده می‌شود
-    public void setAdDataForEdit(String adId, String title, double price, String city, String category, String description, String text) {
+    public void setAdDataForEdit(String adId, String title, double price, String city, String category, String description, String text, String attributesJson) {
         this.editingAdId = adId;
 
         titleField.setText(title);
@@ -46,6 +129,39 @@ public class NewAdController {
         categoryComboBox.setValue(category);
         descriptionField.setText(description);
         imageUrlsField.setText(text);
+
+        updateDynamicFields(category);
+
+        // ۲. پر کردن مقادیر قبلی فیلدها از روی رشته JSON
+        if (attributesJson != null && !attributesJson.trim().isEmpty()) {
+            try {
+                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                java.util.Map<String, String> attributes = mapper.readValue(
+                        attributesJson,
+                        new com.fasterxml.jackson.core.type.TypeReference<java.util.Map<String, String>>() {}
+                );
+
+                // ست کردن مقادیر در فیلدها
+                if (mileageField != null && attributes.containsKey("کارکرد")) {
+                    // حذف عبارت "کیلومتر" برای قرارگیری عدد خالص در TextField
+                    String mileageVal = attributes.get("کارکرد").replace("کیلومتر", "").trim();
+                    mileageField.setText(mileageVal);
+                }
+                if (areaField != null && attributes.containsKey("متراژ")) {
+                    String areaVal = attributes.get("متراژ").replace("متر مربع", "").trim();
+                    areaField.setText(areaVal);
+                }
+                if (markField != null && attributes.containsKey("مدل و برند")) {
+                    markField.setText(attributes.get("مدل و برند"));
+                }
+                if (colorField != null && attributes.containsKey("رنگ")) {
+                    colorField.setText(attributes.get("رنگ"));
+                }
+
+            } catch (Exception e) {
+                showAlert(Alert.AlertType.ERROR, "خطا در عملیات", e.getMessage());
+            }
+        }
 
         categoryComboBox.setDisable(true);
     }
@@ -100,17 +216,19 @@ public class NewAdController {
             }
         }
 
+        String attributesJson = buildAttributesJson();
+
         try {
             // بخش اصلی
             if (editingAdId != null) {
                 // اگر متغیر آی‌دی خالی نبود، یعنی در حال ویرایش هستیم:
                 //  پاس دادن لیست عکس‌ها به متد ویرایش
-                adService.updateAdvertisement(editingAdId, title, description, pricee, city, category, imageUrlsList);
+                adService.updateAdvertisement(editingAdId, title, description, pricee, city, category, imageUrlsList, attributesJson);
                 showAlert(Alert.AlertType.INFORMATION, "موفق", "تغییرات آگهی با موفقیت ذخیره شد.");
             } else {
                 // اگر خالی بود، یعنی کاربر دارد آگهی جدید ثبت می‌کند:
                 //  پاس دادن لیست عکس‌ها به متد ساخت آگهی جدید
-                adService.createAdvertisement(title, description, pricee, city, category, imageUrlsList);
+                adService.createAdvertisement(title, description, pricee, city, category, imageUrlsList, attributesJson);
                 showAlert(Alert.AlertType.INFORMATION, "موفق","آگهی با موفقیت ثبت شد و در انتظار بررسی مدیر قرار گرفت.");
             }
 
@@ -123,6 +241,35 @@ public class NewAdController {
 
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "خطا در عملیات", e.getMessage());
+        }
+    }
+
+
+    private String buildAttributesJson() {
+        java.util.Map<String, String> attributes = new java.util.HashMap<>();
+
+        if (mileageField != null && !mileageField.getText().trim().isEmpty()) {
+            attributes.put("کارکرد", mileageField.getText().trim() + " کیلومتر");
+        }
+        if (areaField != null && !areaField.getText().trim().isEmpty()) {
+            attributes.put("متراژ", areaField.getText().trim() + " متر مربع");
+        }
+        if (markField != null && !markField.getText().trim().isEmpty()) {
+            attributes.put("مدل  برند", markField.getText().trim());
+        }
+        if (colorField != null && !colorField.getText().trim().isEmpty()) {
+            attributes.put("رنگ", colorField.getText().trim());
+        }
+
+        if (attributes.isEmpty()) {
+            return "{}";
+        }
+
+        try {
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            return mapper.writeValueAsString(attributes);
+        } catch (Exception e) {
+            return "{}";
         }
     }
 
@@ -197,6 +344,10 @@ public class NewAdController {
         cityField.clear();
         categoryComboBox.setValue(null);
         categoryComboBox.setDisable(false);
+
+        if (dynamicFieldsContainer != null) {
+            dynamicFieldsContainer.getChildren().clear();
+        }
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {

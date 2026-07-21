@@ -27,6 +27,7 @@ public class AdDetailsController {
     @FXML private HBox buyerActionsBox;
     @FXML private HBox ownerActionsBox;
     @FXML private ImageView adImageView;
+    @FXML private javafx.scene.layout.VBox customAttributesBox;
 
     private final PublicAdService adService = new PublicAdService();
     private String currentAdId;
@@ -111,6 +112,36 @@ public class AdDetailsController {
                 adImageView.setImage(image);
             }
 
+            // نمایش مشخصات اختصاصی (دینامیک) آگهی
+            if (customAttributesBox != null) {
+                customAttributesBox.getChildren().clear(); // پاک کردن مشخصات قبلی
+
+                if (ad.getAttributesJson() != null && !ad.getAttributesJson().trim().isEmpty()) {
+                    try {
+                        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                        java.util.Map<String, String> attributes = mapper.readValue(
+                                ad.getAttributesJson(),
+                                new com.fasterxml.jackson.core.type.TypeReference<java.util.Map<String, String>>() {}
+                        );
+
+                        for (java.util.Map.Entry<String, String> entry : attributes.entrySet()) {
+                            HBox row = new HBox(10);
+                            row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+
+                            Label keyLabel = new Label(entry.getKey() + ":");
+                            keyLabel.setStyle("-fx-font-weight: bold; -fx-min-width: 80px;");
+
+                            Label valueLabel = new Label(entry.getValue());
+
+                            row.getChildren().addAll(keyLabel, valueLabel);
+                            customAttributesBox.getChildren().add(row);
+                        }
+                    } catch (Exception e) {
+                        System.err.println("خطا در رندر مشخصات دینامیک: " + e.getMessage());
+                    }
+                }
+            }
+
             // ۱۰. مقایسه مالکیت آگهی با کاربر فعلی جهت نمایش دکمه‌های مناسب
             String currentUserId = SessionManager.getInstance().getUserId();
             Object ownerIdObj = ad.getOwnerId();
@@ -174,6 +205,7 @@ public class AdDetailsController {
         if (currentAdId == null) return;
 
         try {
+            AdDetailsResponse ad = adService.getAdvertisementDetails(currentAdId);
             javafx.stage.Stage stage = (javafx.stage.Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/org/example/frontend/new-advertisement.fxml"));
             javafx.scene.Parent root = loader.load();
@@ -187,7 +219,8 @@ public class AdDetailsController {
                     cityLabel != null ? cityLabel.getText() : "",
                     categoryLabel != null ? categoryLabel.getText() : "",
                     descriptionArea != null ? descriptionArea.getText() : "",
-                    imageLabel != null ? imageLabel.getText() : ""
+                    imageLabel != null ? imageLabel.getText() : "",
+                    ad != null ? ad.getAttributesJson() : "{}"
             );
 
             stage.setScene(new javafx.scene.Scene(root));
@@ -195,6 +228,8 @@ public class AdDetailsController {
             stage.show();
         } catch (java.io.IOException e) {
             e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "خطا", "خطا در بارگذاری صفحه ویرایش آگهی.");
+        } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "خطا", "خطا در بارگذاری صفحه ویرایش آگهی.");
         }
     }

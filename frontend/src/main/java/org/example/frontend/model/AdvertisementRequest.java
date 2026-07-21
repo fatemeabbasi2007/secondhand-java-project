@@ -20,17 +20,20 @@ public class AdvertisementRequest {
     @JsonProperty("imageUrls")
     private List<String> imageUrlsList;
 
+    private String AttributesJson;
+
     public AdvertisementRequest() {}
 
-    public AdvertisementRequest(String title, String description, double price, String city, String categoryId) {
+    public AdvertisementRequest(String title, String description, double price, String city, String categoryId, String attributesJson) {
         this.title = title;
         this.description = description;
         this.price = price;
         this.city = city;
         this.categoryId = categoryId;
+        this.AttributesJson = attributesJson;
     }
 
-    public AdvertisementRequest(String id, String title, String description, double price, String city, String categoryId, List<String> imageUrlsList) {
+    public AdvertisementRequest(String id, String title, String description, double price, String city, String categoryId, List<String> imageUrlsList, String attributesJson) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -38,6 +41,7 @@ public class AdvertisementRequest {
         this.city = city;
         this.categoryId = categoryId;
         this.imageUrlsList = imageUrlsList;
+        this.AttributesJson = attributesJson;
     }
 
     // --- Getterها و Setterها ---
@@ -61,4 +65,7 @@ public class AdvertisementRequest {
 
     public void setId(String id) { this.id = id; }
     public String getId() { return id; }
+
+    public String getAttributesJson() {return AttributesJson;}
+    public void setAttributesJson(String attributesJson) {AttributesJson = attributesJson;}
 }
