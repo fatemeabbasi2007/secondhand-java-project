@@ -37,6 +37,8 @@ public class AdDetailsResponse {
 
     private String status;
 
+    private String AttributesJson;
+
     public AdDetailsResponse() {}
 
     // --- Getter ها و Setter ها همراه با کنترل Null ---
@@ -90,6 +92,9 @@ public class AdDetailsResponse {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public String getAttributesJson() {return AttributesJson;}
+    public void setAttributesJson(String attributesJson) {AttributesJson = attributesJson;}
 
     // تبدیل کد انگلیسی یا مقدار دریافت شده به نام فارسی مناسب
     private String toCategoryName(String cat) {

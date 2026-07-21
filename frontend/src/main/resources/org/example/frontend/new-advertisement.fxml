@@ -21,6 +21,8 @@
         <ComboBox fx:id="categoryComboBox" promptText="انتخاب کنید..." prefWidth="300.0"
                   style="-fx-background-color: #F1F2F6; -fx-background-radius: 5;"/>
     </VBox>
+    <VBox fx:id="dynamicFieldsContainer" spacing="10.0" />
+
     <!--<TextField fx:id="imageUrlsField" promptText="آدرس عکس *"/>-->
     <!-- دکمه انتخاب عکس و پیش‌نمایش -->
     <HBox spacing="10" alignment="CENTER_LEFT">

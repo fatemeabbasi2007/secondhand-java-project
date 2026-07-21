@@ -28,6 +28,8 @@ public class AdResponse {
     @JsonAlias({"imageUrls", "imageUrl", "imageUrlsList"})
     private List<String> imageUrlsList;
 
+    private String AttributesJson;
+
     public AdResponse() {}
 
     public String getId() { return id; }
@@ -55,6 +57,9 @@ public class AdResponse {
 
     public List<String> getImageUrlsList() { return imageUrlsList; }
     public void setImageUrlsList(List<String> imageUrlsList) { this.imageUrlsList = imageUrlsList; }
+
+    public String getAttributesJson() {return AttributesJson;}
+    public void setAttributesJson(String attributesJson) {AttributesJson = attributesJson;}
 
     private String toCategoryName(String cat) {
         if (cat == null || cat.trim().isEmpty()) return "سایر";
