@@ -1,6 +1,7 @@
 package org.example.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -9,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true) // 👈 این آنوتیشن را اضافه کنید
 public class Advertisement {
     private String id;               // Unique UUID string
     private String title;            // Searched by keyword

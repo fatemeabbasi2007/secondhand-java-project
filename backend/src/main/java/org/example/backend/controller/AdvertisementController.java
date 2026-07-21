@@ -61,27 +61,29 @@ public class AdvertisementController {
 
 
     @PostMapping("/create")
-    public ResponseEntity<?> createAd(@RequestBody Advertisement advertisement, @RequestParam(required = false) List<String> imageUrls , HttpSession session) {
+    public ResponseEntity<?> createAd(@RequestBody Advertisement advertisement, HttpSession session) {
         User loggedInUser = (User) session.getAttribute("user");
         if (loggedInUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ErrorResponse("لطفاً ابتدا وارد حساب کاربری خود شوید"));
         }
-        List<String> safeImageUrls = (imageUrls != null) ? imageUrls : new ArrayList<>();
-         try{
-             advertisementService.createNewAdvertisement(advertisement , safeImageUrls, loggedInUser.getId());
-             return ResponseEntity.ok(new MessageResponse("اگهی با موفقیت در صف بررسی قرار گرفت"));
-         }catch (UserNotFoundException e){
-             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
-         }catch (UserBannedException e ){
-             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
-         }catch(PriceNegativeException | TitleInvalidException | InvalidCategoryIdException | IllegalArgumentException e){
-             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
-         }catch (Exception e) {
-             // ۴. یک تور نجات کلی برای خطاهای پیش‌بینی نشده
-             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                     .body(new ErrorResponse("خطای سیستمی رخ داده است: " + e.getMessage()));
-         }
+
+        // لیست عکس‌ها به طور خودکار از داخل بدنه JSON خوانده می‌شود
+        List<String> safeImageUrls = (advertisement.getImageUrls() != null) ? advertisement.getImageUrls() : new ArrayList<>();
+
+        try {
+            advertisementService.createNewAdvertisement(advertisement, safeImageUrls, loggedInUser.getId());
+            return ResponseEntity.ok(new MessageResponse("آگهی با موفقیت در صف بررسی قرار گرفت"));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
+        } catch (UserBannedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
+        } catch (PriceNegativeException | TitleInvalidException | InvalidCategoryIdException | IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse("خطای سیستمی رخ داده است: " + e.getMessage()));
+        }
     }
 
     @PutMapping("/own/{advertisementId}")
