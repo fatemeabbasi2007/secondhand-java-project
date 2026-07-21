@@ -51,6 +51,8 @@ public class AdvertisementService {
                 throw new IllegalArgumentException("فیلد ضروری '" + rule.getAttributeName() + "' برای این دسته بندی وارد نشده است.");
             }
         }
+        validateSpecificAttributes(ad.getCategoryId(), ad.getSpecificAttributes());
+
         ad.setStatus(AdStatus.PENDING_REVIEW);
         ad.setImageUrls(imageUrls);
         ad.setCreatedAt(LocalDateTime.now());
@@ -59,6 +61,12 @@ public class AdvertisementService {
         advertisementRepository.save(ad);
 
         return ad;
+    }
+    public List<AttributeRule> getRulesForCategory(String categoryId) {
+        if (categoryId == null || categoryId.trim().isEmpty()) {
+            return Collections.emptyList();
+        }
+        return attributeRulesRepository.findByCategoryId(categoryId);
     }
     public Advertisement getVerifiedAdvertisement(String advertisementId , String userId){
         if ( advertisementId == null || advertisementId.trim().isEmpty()){
@@ -90,6 +98,7 @@ public class AdvertisementService {
         }
         Category category = categoryRepository.findByID(updatedAd.getCategoryId())
                 .orElseThrow(() -> new InvalidCategoryIdException("دسته بندی وجود ندارد"));
+        validateSpecificAttributes(ad.getCategoryId(), ad.getSpecificAttributes());
 
         List<AttributeRule> rules = attributeRulesRepository.findByCategoryId(updatedAd.getCategoryId());
         for (AttributeRule rule : rules) {
@@ -157,6 +166,23 @@ public class AdvertisementService {
                 })
                 .collect(Collectors.toList());
     }
+    private void validateSpecificAttributes(String categoryId, Map<String, String> specificAttributes) {
+        if (specificAttributes == null) {
+            specificAttributes = new HashMap<>();
+        }
+
+        // دریافت قوانین مربوط به این دسته‌بندی
+        List<AttributeRule> rules = attributeRulesRepository.findByCategoryId(categoryId);
+
+        for (AttributeRule rule : rules) {
+            String value = specificAttributes.get(rule.getAttributeName());
+
+            // اگر فیلد اجباری است اما مقدار ندارد یا فقط اسپیس است
+            if (rule.isRequired() && (value == null || value.trim().isEmpty())) {
+                throw new IllegalArgumentException("فیلد ضروری '" + rule.getAttributeName() + "' وارد نشده است.");
+            }
+        }
+    }
 
     public AdvertisementDetailDTO getActiveAdvertisementDetail(String advertisementId, String userId) {
         User user = userRepository.findByID(userId)
@@ -174,15 +200,19 @@ public class AdvertisementService {
         }
         User seller = userRepository.findByID(advertisement.getOwnerId()).orElseThrow( () -> new UserNotFoundException("فروشنده آگهی یافت نشد"));
         List<AttributeRule> rules = attributeRulesRepository.findByCategoryId(advertisement.getCategoryId());
-        Map<String , String> rawAttributes = advertisement.getSpecificAttributes();
+        Map<String, String> rawAttributes = advertisement.getSpecificAttributes() != null
+                ? advertisement.getSpecificAttributes()
+                : Collections.emptyMap();
+
         List<AdvertisementDetailDTO.AttributeRenderDTO> enrichedAttributes = rules.stream()
-                .filter(rule -> rawAttributes.containsKey(rule.getId())) // فقط ویژگی‌هایی که کاربر پر کرده
+                .filter(rule -> rawAttributes.containsKey(rule.getAttributeName())
+                        && rawAttributes.get(rule.getAttributeName()) != null
+                        && !rawAttributes.get(rule.getAttributeName()).isBlank())
                 .map(rule -> new AdvertisementDetailDTO.AttributeRenderDTO(
-                        rule.getAttributeName(), // عنوان فارسی از فایل JSON (مثلا: کارکرد)
-                        rawAttributes.get(rule.getId()) // مقدار از دیتابیس آگهی (مثلا: 50000)
+                        rule.getAttributeName(),
+                        rawAttributes.get(rule.getAttributeName())
                 ))
                 .collect(Collectors.toList());
-
 
 
         AdvertisementDetailDTO dto = new AdvertisementDetailDTO(advertisement , user.getUsername() , seller.getAverageRating());
