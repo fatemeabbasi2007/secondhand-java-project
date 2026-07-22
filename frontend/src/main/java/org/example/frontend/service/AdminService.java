@@ -140,7 +140,7 @@ public class AdminService {
 
     public List<AdResponse> getAllActiveAdvertisements() throws Exception {
         // دریافت تمام آگهی‌های فعال بدون اعمال هیچ فیلتری
-        return publicAdService.getActiveAdvertisements(null, null, null, null, null);[span_0](start_span)[span_0](end_span)[span_1](start_span)[span_1](end_span)
+        return publicAdService.getActiveAdvertisements(null, null, null, null, null);
     }
 
     private void handleErrorResponse(HttpResponse<String> response) throws Exception {

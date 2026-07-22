@@ -123,6 +123,17 @@ public class AdvertisementService {
 
         return true;
     }
+    public void approveAdvertisement(String advertisementId , String userId ){
+        User user = userRepository.findByID(userId)
+                .orElseThrow(() -> new UserNotFoundException("کاربر یافت نشد"));
+
+        if ( !user.isEnabled()){
+            throw new UserBannedException("کاربر مسدود است");
+        }
+        Advertisement advertisement  = advertisementRepository.findByID(advertisementId).orElseThrow(() -> new AdvertisementNotFoundException("اکهی یافت نشد"));
+        advertisement.setStatus(AdStatus.ACTIVE);
+        advertisementRepository.save(advertisement);
+    }
 
     public boolean deleteOwnAdvertisement(String adId, String userId) {
         User user = userRepository.findByID(userId)
