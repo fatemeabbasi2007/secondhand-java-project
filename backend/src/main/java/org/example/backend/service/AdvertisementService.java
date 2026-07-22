@@ -79,21 +79,20 @@ public class AdvertisementService {
         }
         return ad;
     }
-    public boolean updateOwnAdvertisement( String userId,Advertisement updatedAd) {
-
+    public boolean updateOwnAdvertisement(String userId, Advertisement updatedAd) {
         User user = userRepository.findByID(userId).orElseThrow(() -> new UserNotFoundException("کاربر یافت نشد"));
-        if ( !user.isEnabled()){
+        if (!user.isEnabled()) {
             throw new UserBannedException("کاربر مسدود است");
         }
-        if ( updatedAd == null){
+        if (updatedAd == null) {
             throw new IllegalArgumentException("اگهی جدید نامعتبر است");
         }
-        Advertisement ad = getVerifiedAdvertisement(updatedAd.getId() , userId);
+        Advertisement ad = getVerifiedAdvertisement(updatedAd.getId(), userId);
 
-        if (updatedAd.getTitle() == null|| updatedAd.getTitle().trim().isEmpty()){
+        if (updatedAd.getTitle() == null || updatedAd.getTitle().trim().isEmpty()) {
             throw new TitleInvalidException("عنوان آگهی اجباری است");
         }
-        if ( updatedAd.getPrice() < 0 ){
+        if (updatedAd.getPrice() < 0) {
             throw new PriceNegativeException("قیمت نامعتبر است");
         }
         Category category = categoryRepository.findByID(updatedAd.getCategoryId())
@@ -106,12 +105,19 @@ public class AdvertisementService {
                 throw new IllegalArgumentException("فیلد ضروری '" + rule.getAttributeName() + "' برای این دسته بندی وارد نشده است.");
             }
         }
+
         ad.setTitle(updatedAd.getTitle());
         ad.setDescription(updatedAd.getDescription());
         ad.setPrice(updatedAd.getPrice());
         ad.setCity(updatedAd.getCity());
         ad.setCategoryId(updatedAd.getCategoryId());
         ad.setSpecificAttributes(updatedAd.getSpecificAttributes());
+
+        // 👈 اضافه شدن این خط برای به‌روزرسانی لیست عکس‌ها:
+        if (updatedAd.getImageUrls() != null) {
+            ad.setImageUrls(updatedAd.getImageUrls());
+        }
+
         ad.setStatus(AdStatus.PENDING_REVIEW);
         advertisementRepository.save(ad);
 
