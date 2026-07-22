@@ -19,11 +19,12 @@ public class AdminPendingAdDTO {
     private String categoryId;
 
     private String ownerId;
+    private String ownerUsername;
 
     @JsonProperty("imageUrl")
     private List<String> imageUrls; // تغییر نام به جمع جهت شفافیت بیشتر
 
-    public AdminPendingAdDTO(Advertisement ad) {
+    public AdminPendingAdDTO(Advertisement ad, String ownerUsername ) {
         this.id = ad.getId();
         this.title = ad.getTitle();
         this.description = ad.getDescription();
@@ -32,5 +33,7 @@ public class AdminPendingAdDTO {
         this.cityName = ad.getCity();
         this.categoryId = ad.getCategoryId();
         this.ownerId = ad.getOwnerId();
+        this.ownerUsername =ownerUsername;
+
     }
 }

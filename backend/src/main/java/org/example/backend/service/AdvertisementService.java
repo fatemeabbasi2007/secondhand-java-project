@@ -246,30 +246,20 @@ public class AdvertisementService {
 
 
     public List<AdminPendingAdDTO> getPendingAdvertisementsForAdmin(String userId) {
-        User user = userRepository.findByID(userId).orElseThrow( () -> new UserNotFoundException("کاربر یافت نشد"));
+        User user = userRepository.findByID(userId).orElseThrow(() -> new UserNotFoundException("کاربر یافت نشد"));
         if (!"ADMIN".equals(user.getRole())) {
             throw new NoAcceessException("فقط ادمین دسترسی لازم برای این کار را دارد");
         }
 
         List<Advertisement> pendingAds = advertisementRepository.findByStatus(AdStatus.PENDING_REVIEW);
-        return pendingAds.stream().map(AdminPendingAdDTO::new).collect(Collectors.toList());
-    }
 
-    public boolean approveAdvertisement(String advertisementId , String adminId) {
-        User user = userRepository.findByID(adminId).orElseThrow( () -> new UserNotFoundException("کاربر یافت نشد"));
-        if (!"ADMIN".equals(user.getRole())) {
-            throw new NoAcceessException("فقط ادمین دسترسی لازم برای این کار را دارد");
-        }
-        Advertisement advertisement = advertisementRepository.findByID(advertisementId)
-                .orElseThrow(() -> new AdvertisementNotFoundException("آگهی وجود ندارد"));
-
-        if (advertisement.getStatus() != AdStatus.PENDING_REVIEW) {
-            throw new AdvertisementStatusException("آگهی در صف تایید نیست و وضعیت آن " + advertisement.getStatus() + " است");
-        }
-        advertisement.setStatus(AdStatus.ACTIVE);
-        advertisementRepository.save(advertisement);
-
-        return true;
+        return pendingAds.stream().map(ad -> {
+            // 👈 پیدا کردن نام کاربری بر اساس ownerId
+            String username = userRepository.findByID(ad.getOwnerId())
+                    .map(User::getUsername)
+                    .orElse("ناشناس");
+            return new AdminPendingAdDTO(ad, username);
+        }).collect(Collectors.toList());
     }
 
     public boolean rejectAdvertisement(String advertisementId, String rejectReason, String adminId) {

@@ -174,7 +174,8 @@ public class AdvertisementController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("ابتدا وارد شوید"));
         }
         try{
-            advertisementService.approveAdvertisement(advertisementId , user.getId());
+            //a.approveAdvertisement(advertisementId , user.getId());
+
             return ResponseEntity.ok(new MessageResponse("اگهی تایید شد"));
         }catch (UserNotFoundException | AdvertisementNotFoundException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
