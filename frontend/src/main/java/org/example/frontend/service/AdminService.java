@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.frontend.config.ApiClient;
 import org.example.frontend.config.ApiConfig;
+import org.example.frontend.model.AdResponse;
 import org.example.frontend.model.ErrorResponse;
 import org.example.frontend.model.PendingAdResponse;
 import org.example.frontend.model.UserResponse;
@@ -132,6 +133,14 @@ public class AdminService {
         if (response.statusCode() != 200 && response.statusCode() != 204) {
             handleErrorResponse(response);
         }
+    }
+
+    // for delete
+    private final PublicAdService publicAdService = new PublicAdService();
+
+    public List<AdResponse> getAllActiveAdvertisements() throws Exception {
+        // دریافت تمام آگهی‌های فعال بدون اعمال هیچ فیلتری
+        return publicAdService.getActiveAdvertisements(null, null, null, null, null);[span_0](start_span)[span_0](end_span)[span_1](start_span)[span_1](end_span)
     }
 
     private void handleErrorResponse(HttpResponse<String> response) throws Exception {

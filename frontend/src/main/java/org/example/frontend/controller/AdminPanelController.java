@@ -1,5 +1,6 @@
 package org.example.frontend.controller;
 
+import org.example.frontend.model.AdResponse;
 import org.example.frontend.model.PendingAdResponse;
 import org.example.frontend.model.UserResponse;
 import org.example.frontend.security.SessionManager;
@@ -33,6 +34,11 @@ public class AdminPanelController {
     @FXML private Label userEmailLabel;
     @FXML private Label userStatusLabel;
     @FXML private Button blockToggleButton;
+
+    @FXML private ListView<AdResponse> activeAdsListView; // اضافه کردن fx:id لیست جدید
+
+    private final ObservableList<AdResponse> activeAdsList = FXCollections.observableArrayList();
+    private AdResponse selectedActiveAd;
 
     private final AdminService adminService = new AdminService();
     private final ObservableList<PendingAdResponse> pendingAdsList = FXCollections.observableArrayList();
@@ -81,6 +87,36 @@ public class AdminPanelController {
         // بارگذاری داده‌های اولیه
         loadPendingAds();
         loadAllUsers();
+
+        // تنظیم لیست آگهی‌های فعال
+        activeAdsListView.setItems(activeAdsList);
+        activeAdsListView.setCellFactory(param -> new ListCell<>() {
+            @Override
+            protected void updateItem(AdResponse item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item.getTitle() + " - (فروشنده: " + item.getOwnerUsername() + " | قیمت: " + String.format("%,.0f", item.getPrice()) + " تومان)");
+                }
+            }
+        });
+
+        activeAdsListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            this.selectedActiveAd = newVal;
+        });
+
+        // بارگذاری اولیه لیست آگهی‌های فعال
+        loadAllActiveAds();
+    }
+
+    private void loadAllActiveAds() {
+        try {
+            List<AdResponse> ads = adminService.getAllActiveAdvertisements();
+            activeAdsList.setAll(ads);
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "خطا در بارگذاری آگهی‌ها", e.getMessage());
+        }
     }
 
     private void loadPendingAds() {
@@ -187,6 +223,30 @@ public class AdminPanelController {
                 }
             }
         });
+    }
+
+    @FXML
+    public void onDeleteActiveAdClick(ActionEvent event) {
+        if (selectedActiveAd == null) {
+            showAlert(Alert.AlertType.WARNING, "انتخاب آگهی", "لطفاً ابتدا یک آگهی را از لیست انتخاب کنید.");
+            return;
+        }
+
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION, "آیا از حذف این آگهی فعال نامناسب مطمئن هستید؟", ButtonType.YES, ButtonType.NO);
+                confirmAlert.showAndWait().ifPresent(response -> {
+                    if (response == ButtonType.YES) {
+                        try {
+                            // استفاده از همان متد حذف ادمین
+                            adminService.deleteInappropriateAdvertisement(selectedActiveAd.getId());
+                                    showAlert(Alert.AlertType.INFORMATION, "موفق", "آگهی نامناسب با موفقیت از سیستم حذف شد.");
+
+                                    // به‌روزرسانی لیست آگهی‌های فعال
+                                    loadAllActiveAds();
+                        } catch (Exception e) {
+                            showAlert(Alert.AlertType.ERROR, "خطا در حذف", e.getMessage());
+                        }
+                    }
+                });
     }
 
     // قابلیت مسدود / رفع مسدود کردن کاربر (جدید)

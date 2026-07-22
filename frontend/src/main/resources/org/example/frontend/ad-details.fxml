@@ -67,7 +67,7 @@
     </GridPane>
 
     <VBox fx:id="customAttributesBox" spacing="8" />
-    
+
     <Separator />
 
     <!-- بخش توضیحات -->
