@@ -1,5 +1,6 @@
 package org.example.frontend.controller;
 
+import org.example.frontend.model.AdResponse;
 import org.example.frontend.model.PendingAdResponse;
 import org.example.frontend.model.UserResponse;
 import org.example.frontend.security.SessionManager;
@@ -25,7 +26,7 @@ public class AdminPanelController {
     @FXML private TextArea descriptionArea;
     @FXML private TextField reasonField;
 
-    // فیلدهای مربوط به مدیریت کاربران
+    // فیلدهای مربوط به مدیریت کاربران (جدید)
     @FXML private ListView<UserResponse> usersListView;
     @FXML private Label userFullNameLabel;
     @FXML private Label userUsernameLabel;
@@ -33,6 +34,11 @@ public class AdminPanelController {
     @FXML private Label userEmailLabel;
     @FXML private Label userStatusLabel;
     @FXML private Button blockToggleButton;
+
+    @FXML private ListView<AdResponse> activeAdsListView; // اضافه کردن fx:id لیست جدید
+
+    private final ObservableList<AdResponse> activeAdsList = FXCollections.observableArrayList();
+    private AdResponse selectedActiveAd;
 
     private final AdminService adminService = new AdminService();
     private final ObservableList<PendingAdResponse> pendingAdsList = FXCollections.observableArrayList();
@@ -43,7 +49,7 @@ public class AdminPanelController {
 
     @FXML
     public void initialize() {
-        // ۱. تنظیم لیست آگهی‌ها (نمایش عنوان و نام کاربری)
+        // تنظیم لیست آگهی‌ها
         pendingAdsListView.setItems(pendingAdsList);
         pendingAdsListView.setCellFactory(param -> new ListCell<>() {
             @Override
@@ -52,8 +58,7 @@ public class AdminPanelController {
                 if (empty || item == null) {
                     setText(null);
                 } else {
-                    // 👈 استفاده از متد جدید جهت دریافت نام کاربری
-                    setText(item.getTitle() + " - (کاربر: " + getOwnerDisplayName(item) + ")");
+                    setText(item.getTitle() + " - (کاربر: " + item.getOwnerUsername() + ")");
                 }
             }
         });
@@ -61,7 +66,7 @@ public class AdminPanelController {
             if (newVal != null) showAdDetails(newVal);
         });
 
-        // ۲. تنظیم لیست کاربران
+        // تنظیم لیست کاربران
         usersListView.setItems(usersList);
         usersListView.setCellFactory(param -> new ListCell<>() {
             @Override
@@ -82,6 +87,36 @@ public class AdminPanelController {
         // بارگذاری داده‌های اولیه
         loadPendingAds();
         loadAllUsers();
+
+        // تنظیم لیست آگهی‌های فعال
+        activeAdsListView.setItems(activeAdsList);
+        activeAdsListView.setCellFactory(param -> new ListCell<>() {
+            @Override
+            protected void updateItem(AdResponse item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item.getTitle() + " - (فروشنده: " + item.getOwnerUsername() + " | قیمت: " + String.format("%,.0f", item.getPrice()) + " تومان)");
+                }
+            }
+        });
+
+        activeAdsListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            this.selectedActiveAd = newVal;
+        });
+
+        // بارگذاری اولیه لیست آگهی‌های فعال
+        loadAllActiveAds();
+    }
+
+    private void loadAllActiveAds() {
+        try {
+            List<AdResponse> ads = adminService.getAllActiveAdvertisements();
+            activeAdsList.setAll(ads);
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "خطا در بارگذاری آگهی‌ها", e.getMessage());
+        }
     }
 
     private void loadPendingAds() {
@@ -106,23 +141,20 @@ public class AdminPanelController {
 
     private void showAdDetails(PendingAdResponse ad) {
         this.selectedAd = ad;
-        titleLabel.setText(ad.getTitle() != null ? ad.getTitle() : "-");
+        titleLabel.setText(ad.getTitle());
         priceLabel.setText(String.format("%,.0f تومان", ad.getPrice()));
-        cityLabel.setText(ad.getCity() != null ? ad.getCity() : "-");
-        categoryLabel.setText(ad.getCategory() != null ? ad.getCategory() : "-");
-
-        // 👈 نمایش نام کاربری در پنل جزئیات آگهی
-        ownerLabel.setText(getOwnerDisplayName(ad));
-
-        descriptionArea.setText(ad.getDescription() != null ? ad.getDescription() : "");
+        cityLabel.setText(ad.getCity());
+        categoryLabel.setText(ad.getCategory());
+        ownerLabel.setText(ad.getOwnerUsername());
+        descriptionArea.setText(ad.getDescription());
         reasonField.clear();
     }
 
     private void showUserDetails(UserResponse user) {
         this.selectedUser = user;
-        userFullNameLabel.setText(user.getFullName() != null ? user.getFullName() : "-");
-        userUsernameLabel.setText(user.getUsername() != null ? user.getUsername() : "-");
-        userPhoneLabel.setText(user.getPhoneNumber() != null ? user.getPhoneNumber() : "-");
+        userFullNameLabel.setText(user.getFullName());
+        userUsernameLabel.setText(user.getUsername());
+        userPhoneLabel.setText(user.getPhoneNumber());
         userEmailLabel.setText(user.getEmail() != null ? user.getEmail() : "ثبت نشده");
 
         if (user.isBlocked()) {
@@ -136,19 +168,6 @@ public class AdminPanelController {
             blockToggleButton.setText("مسدود کردن کاربر");
             blockToggleButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
         }
-    }
-
-    /**
-     * متد کمکی جهت استخراج ایمن نام کاربری ثبت‌کننده آگهی
-     */
-    private String getOwnerDisplayName(PendingAdResponse ad) {
-        if (ad == null) return "-";
-        if (ad.getOwnerUsername() != null && !ad.getOwnerUsername().trim().isEmpty()) {
-            return ad.getOwnerUsername();
-        }
-//        return ad.getOwnerId() != null ? ad.getOwnerId() : "نامشخص";
-        return  "نامشخص";
-
     }
 
     @FXML
@@ -183,6 +202,7 @@ public class AdminPanelController {
         }
     }
 
+    // قابلیت حذف مستقیم آگهی نامناسب
     @FXML
     public void onDeleteAdClick(ActionEvent event) {
         if (selectedAd == null) {
@@ -190,6 +210,7 @@ public class AdminPanelController {
             return;
         }
 
+        // نمایش تاییدیه برای جلوگیری از حذف تصادفی
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION, "آیا از حذف این آگهی نامناسب مطمئن هستید؟", ButtonType.YES, ButtonType.NO);
         confirmAlert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.YES) {
@@ -205,6 +226,31 @@ public class AdminPanelController {
     }
 
     @FXML
+    public void onDeleteActiveAdClick(ActionEvent event) {
+        if (selectedActiveAd == null) {
+            showAlert(Alert.AlertType.WARNING, "انتخاب آگهی", "لطفاً ابتدا یک آگهی را از لیست انتخاب کنید.");
+            return;
+        }
+
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION, "آیا از حذف این آگهی فعال نامناسب مطمئن هستید؟", ButtonType.YES, ButtonType.NO);
+                confirmAlert.showAndWait().ifPresent(response -> {
+                    if (response == ButtonType.YES) {
+                        try {
+                            // استفاده از همان متد حذف ادمین
+                            adminService.deleteInappropriateAdvertisement(selectedActiveAd.getId());
+                                    showAlert(Alert.AlertType.INFORMATION, "موفق", "آگهی نامناسب با موفقیت از سیستم حذف شد.");
+
+                                    // به‌روزرسانی لیست آگهی‌های فعال
+                                    loadAllActiveAds();
+                        } catch (Exception e) {
+                            showAlert(Alert.AlertType.ERROR, "خطا در حذف", e.getMessage());
+                        }
+                    }
+                });
+    }
+
+    // قابلیت مسدود / رفع مسدود کردن کاربر (جدید)
+    @FXML
     public void onToggleBlockClick(ActionEvent event) {
         if (selectedUser == null) return;
 
@@ -214,7 +260,7 @@ public class AdminPanelController {
         try {
             adminService.toggleUserBlockStatus(selectedUser.getId(), shouldBlock);
             showAlert(Alert.AlertType.INFORMATION, "موفق", "کاربر با موفقیت " + actionName + " شد.");
-            loadAllUsers();
+            loadAllUsers(); // به‌روزرسانی لیست کاربران
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "خطا در تغییر وضعیت", e.getMessage());
         }
@@ -223,7 +269,9 @@ public class AdminPanelController {
     @FXML
     public void onLogoutClick(ActionEvent event) {
         System.out.println("خروج مدیر...");
+        // پاک کردن اطلاعات نشست ادمین در فرانت‌اند
         SessionManager.getInstance().cleanSession();
+        // هدایت به صفحه لاگین
         NavigationService.navigate(event, "login.fxml", "ورود به سامانه");
     }
 

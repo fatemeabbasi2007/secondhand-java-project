@@ -255,7 +255,7 @@ public class NewAdController {
             attributes.put("متراژ", areaField.getText().trim() + " متر مربع");
         }
         if (markField != null && !markField.getText().trim().isEmpty()) {
-            attributes.put("مدل  برند", markField.getText().trim());
+            attributes.put("مدل و برند", markField.getText().trim());
         }
         if (colorField != null && !colorField.getText().trim().isEmpty()) {
             attributes.put("رنگ", colorField.getText().trim());

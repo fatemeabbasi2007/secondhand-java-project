@@ -2,6 +2,7 @@ package org.example.frontend.controller;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
 import org.example.frontend.model.AdDetailsResponse;
 import org.example.frontend.service.PublicAdService;
 import org.example.frontend.security.SessionManager;
@@ -27,7 +28,7 @@ public class AdDetailsController {
     @FXML private HBox buyerActionsBox;
     @FXML private HBox ownerActionsBox;
     @FXML private ImageView adImageView;
-    @FXML private javafx.scene.layout.VBox customAttributesBox;
+    @FXML private VBox customAttributesBox;
 
     private int currentImageIndex = 0;
     private java.util.List<String> imageUrlsList;
