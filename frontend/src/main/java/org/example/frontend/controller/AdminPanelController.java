@@ -49,65 +49,72 @@ public class AdminPanelController {
 
     @FXML
     public void initialize() {
-        // تنظیم لیست آگهی‌ها
-        pendingAdsListView.setItems(pendingAdsList);
-        pendingAdsListView.setCellFactory(param -> new ListCell<>() {
-            @Override
-            protected void updateItem(PendingAdResponse item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item.getTitle() + " - (کاربر: " + item.getOwnerUsername() + ")");
+        // ۱. تنظیم لیست آگهی‌های در انتظار بررسی (Pending)
+        if (pendingAdsListView != null) {
+            pendingAdsListView.setItems(pendingAdsList);
+            pendingAdsListView.setCellFactory(param -> new ListCell<>() {
+                @Override
+                protected void updateItem(PendingAdResponse item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                    } else {
+                        setText(item.getTitle() + " - (کاربر: " + item.getOwnerUsername() + ")");
+                    }
                 }
-            }
-        });
-        pendingAdsListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) showAdDetails(newVal);
-        });
+            });
+            pendingAdsListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal != null) showAdDetails(newVal);
+            });
+        }
 
-        // تنظیم لیست کاربران
-        usersListView.setItems(usersList);
-        usersListView.setCellFactory(param -> new ListCell<>() {
-            @Override
-            protected void updateItem(UserResponse item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    String status = item.isBlocked() ? "[مسدود شده]" : "[فعال]";
-                    setText(item.getUsername() + " - " + status);
+        // ۲. تنظیم لیست کاربران
+        if (usersListView != null) {
+            usersListView.setItems(usersList);
+            usersListView.setCellFactory(param -> new ListCell<>() {
+                @Override
+                protected void updateItem(UserResponse item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                    } else {
+                        String status = item.isBlocked() ? "[مسدود شده]" : "[فعال]";
+                        setText(item.getUsername() + " - " + status);
+                    }
                 }
-            }
-        });
-        usersListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) showUserDetails(newVal);
-        });
+            });
+            usersListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal != null) showUserDetails(newVal);
+            });
+        }
 
-        // بارگذاری داده‌های اولیه
+        // ۳. تنظیم لیست آگهی‌های فعال (با کنترل Null)
+        if (activeAdsListView != null) {
+            activeAdsListView.setItems(activeAdsList);
+            activeAdsListView.setCellFactory(param -> new ListCell<>() {
+                @Override
+                protected void updateItem(AdResponse item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                    } else {
+                        setText(item.getTitle() + " - (فروشنده: " + item.getOwnerUsername() + " | قیمت: " + String.format("%,.0f", item.getPrice()) + " تومان)");
+                    }
+                }
+            });
+
+            activeAdsListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+                this.selectedActiveAd = newVal;
+            });
+        }
+
+        // ۴. بارگذاری داده‌های اولیه به‌صورت مجزا
         loadPendingAds();
         loadAllUsers();
 
-        // تنظیم لیست آگهی‌های فعال
-        activeAdsListView.setItems(activeAdsList);
-        activeAdsListView.setCellFactory(param -> new ListCell<>() {
-            @Override
-            protected void updateItem(AdResponse item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item.getTitle() + " - (فروشنده: " + item.getOwnerUsername() + " | قیمت: " + String.format("%,.0f", item.getPrice()) + " تومان)");
-                }
-            }
-        });
-
-        activeAdsListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            this.selectedActiveAd = newVal;
-        });
-
-        // بارگذاری اولیه لیست آگهی‌های فعال
-        loadAllActiveAds();
+        if (activeAdsListView != null) {
+            loadAllActiveAds();
+        }
     }
 
     private void loadAllActiveAds() {
@@ -177,6 +184,7 @@ public class AdminPanelController {
             adminService.approveAdvertisement(selectedAd.getId().toString());
             showAlert(Alert.AlertType.INFORMATION, "موفق", "آگهی با موفقیت تایید شد.");
             loadPendingAds();
+            loadAllActiveAds(); // ◄ اضافه کردن این خط برای به‌روزرسانی لحظه‌ای تب فعال‌ها
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "خطای تایید", e.getMessage());
         }
@@ -239,7 +247,7 @@ public class AdminPanelController {
                             // استفاده از همان متد حذف ادمین
                             adminService.deleteInappropriateAdvertisement(selectedActiveAd.getId());
                                     showAlert(Alert.AlertType.INFORMATION, "موفق", "آگهی نامناسب با موفقیت از سیستم حذف شد.");
-
+                                    selectedActiveAd = null;
                                     // به‌روزرسانی لیست آگهی‌های فعال
                                     loadAllActiveAds();
                         } catch (Exception e) {
