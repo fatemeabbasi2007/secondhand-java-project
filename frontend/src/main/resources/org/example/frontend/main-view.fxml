@@ -64,8 +64,8 @@
                 <Label style="-fx-font-weight: bold;" text="دسته‌بندی:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
                 <Label fx:id="categoryLabel" text="-" GridPane.columnIndex="2" GridPane.rowIndex="3" />
 
-                <Label style="-fx-font-weight: bold;" text="عکس:" GridPane.rowIndex="4" />
-                <Label fx:id="imageLabel" text="-" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                <!--<Label style="-fx-font-weight: bold;" text="عکس:" GridPane.rowIndex="4" />
+                <Label fx:id="imageLabel" text="-" GridPane.columnIndex="2" GridPane.rowIndex="4" />-->
 
                 <Label style="-fx-font-weight: bold;" text="فروشنده:" GridPane.rowIndex="6" />
                 <Label fx:id="ownerLabel" text="-" GridPane.columnIndex="2" GridPane.rowIndex="6" />

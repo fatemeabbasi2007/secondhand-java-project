@@ -32,7 +32,7 @@ public class MainController {
     @FXML private Label categoryLabel;
     @FXML private Label ownerLabel;
     @FXML private TextArea descriptionArea;
-    @FXML private Label imageLabel;
+    //@FXML private Label imageLabel;
 
     private final PublicAdService adService = new PublicAdService();
     private final ObservableList<AdResponse> observableList = FXCollections.observableArrayList();
@@ -123,11 +123,11 @@ public class MainController {
         ownerLabel.setText(ad.getOwnerUsername());
         descriptionArea.setText(ad.getDescription() != null ? ad.getDescription() : "");
 
-        if (ad.getImageUrlsList() != null && !ad.getImageUrlsList().isEmpty()) {
-            imageLabel.setText(String.join(" ,", ad.getImageUrlsList()));
-        } else {
-            imageLabel.setText("بدون تصویر");
-        }
+//        if (ad.getImageUrlsList() != null && !ad.getImageUrlsList().isEmpty()) {
+//            imageLabel.setText(String.join(" ,", ad.getImageUrlsList()));
+//        } else {
+//            imageLabel.setText("بدون تصویر");
+//        }
     }
 
     // قرار دادن این منطق در زمان کلیک بر روی لیست آگهی‌ها در MainController
@@ -204,7 +204,7 @@ public class MainController {
         cityLabel.setText("-");
         categoryLabel.setText("-");
         ownerLabel.setText("-");
-        imageLabel.setText("-");
+        //imageLabel.setText("-");
         descriptionArea.clear();
     }
 
