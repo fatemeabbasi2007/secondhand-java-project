@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
+import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AdvertisementRequest {
@@ -20,20 +21,22 @@ public class AdvertisementRequest {
     @JsonProperty("imageUrls")
     private List<String> imageUrlsList;
 
-    private String AttributesJson;
+    private Map<String, String> specificAttributes;
+
+//    private String AttributesJson;
 
     public AdvertisementRequest() {}
 
-    public AdvertisementRequest(String title, String description, double price, String city, String categoryId, String attributesJson) {
+    public AdvertisementRequest(String title, String description, double price, String city, String categoryId, Map<String,String> attributesJson) {
         this.title = title;
         this.description = description;
         this.price = price;
         this.city = city;
         this.categoryId = categoryId;
-        this.AttributesJson = attributesJson;
+        this.specificAttributes= attributesJson;
     }
 
-    public AdvertisementRequest(String id, String title, String description, double price, String city, String categoryId, List<String> imageUrlsList, String attributesJson) {
+    public AdvertisementRequest(String id, String title, String description, double price, String city, String categoryId, List<String> imageUrlsList,Map<String,String>  attributesJson) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -41,7 +44,7 @@ public class AdvertisementRequest {
         this.city = city;
         this.categoryId = categoryId;
         this.imageUrlsList = imageUrlsList;
-        this.AttributesJson = attributesJson;
+        this.specificAttributes = attributesJson;
     }
 
     // --- Getterها و Setterها ---
@@ -65,7 +68,13 @@ public class AdvertisementRequest {
 
     public void setId(String id) { this.id = id; }
     public String getId() { return id; }
+    public Map<String,String> getSpecificAttributes() {
+        return specificAttributes;
+    }
 
-    public String getAttributesJson() {return AttributesJson;}
-    public void setAttributesJson(String attributesJson) {AttributesJson = attributesJson;}
+    public void setSpecificAttributes(Map<String,String> specificAttributes) {
+        this.specificAttributes = specificAttributes;
+    }
+
+
 }

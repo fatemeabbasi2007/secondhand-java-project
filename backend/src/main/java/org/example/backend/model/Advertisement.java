@@ -36,7 +36,4 @@ public class Advertisement {
         this.rejectionReason = s;
     }
 
-    public String getId() {
-        return id;
-    }
 }

@@ -120,6 +120,9 @@ public class AdDetailsController {
             }
 
             // نمایش مشخصات اختصاصی (دینامیک) آگهی
+            System.out.println("=== DEBUG ATTRIBUTES ===");
+            System.out.println("Ad ID: " + ad.getId());
+            System.out.println("Attributes JSON: " + ad.getAttributesJson());
             if (customAttributesBox != null) {
                 customAttributesBox.getChildren().clear(); // پاک کردن مشخصات قبلی
 

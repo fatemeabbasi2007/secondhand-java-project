@@ -11,6 +11,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
+import java.util.Map;
 
 public class AdvertisementService {
 
@@ -22,7 +23,7 @@ public class AdvertisementService {
         this.objectMapper = new ObjectMapper();
     }
 
-    public void createAdvertisement(String title, String description, double price, String city, String category, List<String> imageUrls, String attributesJson) throws Exception {
+    public void createAdvertisement(String title, String description, double price, String city, String category, List<String> imageUrls, Map<String,String>  attributesJson) throws Exception {
         String userId = SessionManager.getInstance().getUserId();
         if (userId == null) {
             throw new Exception("شما وارد حساب کاربری خود نشده‌اید.");
@@ -37,6 +38,9 @@ public class AdvertisementService {
 
         String jsonBody = objectMapper.writeValueAsString(adRequest);
 
+        System.out.println("==============");
+        System.out.println(jsonBody);
+        System.out.println("==============");
         // ۳. ارسال درخواست POST
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
@@ -57,7 +61,7 @@ public class AdvertisementService {
     }
 
     // ارسال درخواست ویرایش آگهی به بک‌اند با متد PUT
-    public void updateAdvertisement(String adId, String title, String description, double price, String city, String category, List<String> imageUrls, String attributesJson) throws Exception {
+    public void updateAdvertisement(String adId, String title, String description, double price, String city, String category, List<String> imageUrls, Map<String , String> attributesJson) throws Exception {
         //  بررسی لاگین بودن کاربر از روی سشن
         String userId = SessionManager.getInstance().getUserId();
         if (userId == null) {

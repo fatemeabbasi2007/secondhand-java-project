@@ -88,6 +88,20 @@ public class AdvertisementRepository {
     }
 
     private void flushToFile() {
+        List<Advertisement> ads = new ArrayList<>(cache.values());
+
+        try {
+            System.out.println("===== BEFORE WRITING =====");
+
+            for (Advertisement ad : ads) {
+                System.out.println(ad.getTitle());
+                System.out.println(ad.getSpecificAttributes());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         fileStorage.saveToFile(FILE_NAME, new ArrayList<>(cache.values()));
     }
 }

@@ -1,5 +1,6 @@
 package org.example.backend.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.backend.exeption.*;
 import org.example.backend.model.*;
 import org.example.backend.repository.AdvertisementRepository;
@@ -58,6 +59,17 @@ public class AdvertisementService {
         ad.setCreatedAt(LocalDateTime.now());
         ad.setId(UUID.randomUUID().toString());
         ad.setOwnerId(userID);
+//        System.out.println("Before save:");
+//        ObjectMapper mapper = new ObjectMapper();
+//        try {
+//            System.out.println(
+//                    mapper.writeValueAsString(ad)
+//            );
+//        }catch (Exception e){e.printStackTrace();}
+//        advertisementRepository.findAll().forEach(a ->
+//                System.out.println(a.getSpecificAttributes())
+//        );
+        System.out.println(ad.getSpecificAttributes());
         advertisementRepository.save(ad);
 
         return ad;

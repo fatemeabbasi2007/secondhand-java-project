@@ -12,6 +12,8 @@ import javafx.scene.image.ImageView;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 public class NewAdController {
 
@@ -216,19 +218,18 @@ public class NewAdController {
             }
         }
 
-        String attributesJson = buildAttributesJson();
-
+        Map<String, String> attributes = buildAttributes();
         try {
             // بخش اصلی
             if (editingAdId != null) {
                 // اگر متغیر آی‌دی خالی نبود، یعنی در حال ویرایش هستیم:
                 //  پاس دادن لیست عکس‌ها به متد ویرایش
-                adService.updateAdvertisement(editingAdId, title, description, pricee, city, category, imageUrlsList, attributesJson);
+                adService.updateAdvertisement(editingAdId, title, description, pricee, city, category, imageUrlsList, attributes);
                 showAlert(Alert.AlertType.INFORMATION, "موفق", "تغییرات آگهی با موفقیت ذخیره شد.");
             } else {
                 // اگر خالی بود، یعنی کاربر دارد آگهی جدید ثبت می‌کند:
                 //  پاس دادن لیست عکس‌ها به متد ساخت آگهی جدید
-                adService.createAdvertisement(title, description, pricee, city, category, imageUrlsList, attributesJson);
+                adService.createAdvertisement(title, description, pricee, city, category, imageUrlsList, attributes);
                 showAlert(Alert.AlertType.INFORMATION, "موفق","آگهی با موفقیت ثبت شد و در انتظار بررسی مدیر قرار گرفت.");
             }
 
@@ -245,32 +246,26 @@ public class NewAdController {
     }
 
 
-    private String buildAttributesJson() {
-        java.util.Map<String, String> attributes = new java.util.HashMap<>();
+    private Map<String, String> buildAttributes() {
+        Map<String, String> attributes = new HashMap<>();
 
         if (mileageField != null && !mileageField.getText().trim().isEmpty()) {
             attributes.put("کارکرد", mileageField.getText().trim() + " کیلومتر");
         }
+
         if (areaField != null && !areaField.getText().trim().isEmpty()) {
             attributes.put("متراژ", areaField.getText().trim() + " متر مربع");
         }
+
         if (markField != null && !markField.getText().trim().isEmpty()) {
             attributes.put("مدل و برند", markField.getText().trim());
         }
+
         if (colorField != null && !colorField.getText().trim().isEmpty()) {
             attributes.put("رنگ", colorField.getText().trim());
         }
 
-        if (attributes.isEmpty()) {
-            return "{}";
-        }
-
-        try {
-            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-            return mapper.writeValueAsString(attributes);
-        } catch (Exception e) {
-            return "{}";
-        }
+        return attributes;
     }
 
 

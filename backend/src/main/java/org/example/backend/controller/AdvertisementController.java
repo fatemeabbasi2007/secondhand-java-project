@@ -50,6 +50,8 @@ public class AdvertisementController {
 
         try{
             AdvertisementDetailDTO advertisement = advertisementService.getActiveAdvertisementDetail(id , user.getId());
+            System.out.println("salam :::::::::::::::::::");
+            System.out.println(advertisement.getSpecificAttributes());
             return ResponseEntity.ok(advertisement);
 
         }catch (UserNotFoundException | AdvertisementNotFoundException e ){
