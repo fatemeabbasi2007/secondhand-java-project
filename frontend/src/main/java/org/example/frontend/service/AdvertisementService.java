@@ -38,9 +38,9 @@ public class AdvertisementService {
 
         String jsonBody = objectMapper.writeValueAsString(adRequest);
 
-        System.out.println("==============");
-        System.out.println(jsonBody);
-        System.out.println("==============");
+        //System.out.println("==============");
+       // System.out.println(jsonBody);
+        //System.out.println("==============");
         // ۳. ارسال درخواست POST
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
